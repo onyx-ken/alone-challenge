@@ -18,6 +18,12 @@ spring:
     username: sa
     password:
     driverClassName: org.h2.Driver
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
   h2:
     console:
       enabled: true
@@ -40,7 +46,13 @@ management:
   health:
     defaults:
       enabled: false
-
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
 ---
 
 spring:
