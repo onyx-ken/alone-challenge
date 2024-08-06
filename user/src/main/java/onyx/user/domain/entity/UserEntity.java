@@ -7,6 +7,10 @@ import lombok.NoArgsConstructor;
 import onyx.user.domain.valueobject.Email;
 import onyx.user.domain.valueobject.OauthInfo;
 import onyx.user.domain.valueobject.Profile;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "USERS")
@@ -29,6 +33,12 @@ public class UserEntity {
     Profile profile;
 
     private int points = 0;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     public void updateNickName(String nickName) {
         this.nickName = nickName;
