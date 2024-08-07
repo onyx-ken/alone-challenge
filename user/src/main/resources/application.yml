@@ -6,6 +6,28 @@ spring:
       local: local
       dev: dev, common
       prod: prod, common
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTH_GOOGLE_CLIENT_ID}
+            client-secret: ${OAUTH_GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+            redirect-uri: http://localhost:8001/login/oauth2/code/google
+  data:
+    redis:
+      host: localhost
+      port: 6370
+jwt:
+  secret: ${JWT_SECRET}
+  redirect: http://localhost:8001/login?name=%s&access_token=%s&refresh_token=%s
+  access-token:
+    expiration-time: 3600000
+  refresh-token:
+    expiration-time: 604800000
 
 ---
 

@@ -56,5 +56,7 @@ public class UserEntity {
         return new UserEntity(nickName, emailAddress, oauthInfo);
     }
 
-
+    public void updateBio(String newBio) {
+        profile.updateBio(newBio);
+    }
 }
