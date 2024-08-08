@@ -1,6 +1,8 @@
 package onyx.user.web;
 
 import lombok.RequiredArgsConstructor;
+import onyx.oauth.token.domain.RefreshTokenRedis;
+import onyx.oauth.token.service.RefreshTokenService;
 import onyx.user.domain.entity.UserEntity;
 import onyx.user.domain.valueobject.Email;
 import onyx.user.domain.valueobject.OauthInfo;
@@ -8,16 +10,17 @@ import onyx.user.domain.valueobject.Provider;
 import onyx.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+
+    private final RefreshTokenService refreshTokenService;
 
     /**
      * for Test in SpringCloud or SimpleAPI Call
@@ -42,6 +45,15 @@ public class UserController {
 
         // 등록된 사용자의 정보를 반환
         return new ResponseEntity<>(registeredUser.getNickName(), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/token/{userId}")
+    public ResponseEntity<String> getUsersTokenInfo(@PathVariable Long userId) {
+        Optional<RefreshTokenRedis> refreshTokenByUserId = refreshTokenService.findRefreshTokenByUserId(userId);
+
+        return refreshTokenByUserId
+                .map(refreshTokenRedis -> new ResponseEntity<>(refreshTokenRedis.getToken(), HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>("Token not found", HttpStatus.NOT_FOUND));
     }
 
 }

@@ -1,10 +1,11 @@
 package onyx.oauth.token.repository;
 
-import onyx.oauth.token.domain.RefreshToken;
-import onyx.oauth.token.domain.RefreshTokenEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
+import onyx.oauth.token.domain.RefreshTokenRedis;
+import org.springframework.data.repository.CrudRepository;
 
-public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity, Long> {
-    void save(RefreshToken refreshToken);
+import java.util.Optional;
+
+public interface RefreshTokenRepository extends CrudRepository<RefreshTokenRedis, String> {
+    Optional<RefreshTokenRedis> findByUserId(Long userId);
     void deleteByUserId(Long userId);
 }

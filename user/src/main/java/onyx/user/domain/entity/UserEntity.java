@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import onyx.oauth.OAuth2UserInfo;
 import onyx.user.domain.valueobject.Email;
 import onyx.user.domain.valueobject.OauthInfo;
 import onyx.user.domain.valueobject.Profile;
@@ -58,5 +59,11 @@ public class UserEntity {
 
     public void updateBio(String newBio) {
         profile.updateBio(newBio);
+    }
+
+    public static UserEntity fromOAuth2UserInfo(OAuth2UserInfo userInfo) {
+        Email email = Email.createFromFullAddress(userInfo.getEmail());
+        OauthInfo oauthInfo = OauthInfo.create(userInfo.getProvider(), userInfo.getProviderId());
+        return UserEntity.create(userInfo.getName(), email, oauthInfo);
     }
 }

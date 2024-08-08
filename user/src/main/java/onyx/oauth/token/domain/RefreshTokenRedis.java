@@ -1,10 +1,12 @@
 package onyx.oauth.token.domain;
 
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 
@@ -14,9 +16,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 public class RefreshTokenRedis implements Serializable {
-
+    @Id
     private Long id;
+
+    @Indexed
     private Long userId;
+
     private String token;
 
     public static RefreshTokenRedis fromDomain(RefreshToken token) {
