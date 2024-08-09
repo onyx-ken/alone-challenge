@@ -31,8 +31,7 @@ jwt:
     expiration-time: 604800000
 
 storage:
-  path:
-    profile: upload/files/profile
+  path: upload/files/
 ---
 
 spring:

@@ -1,8 +1,6 @@
 package onyx.user.domain.entity;
 
-import onyx.user.domain.valueobject.Email;
-import onyx.user.domain.valueobject.OauthInfo;
-import onyx.user.domain.valueobject.Provider;
+import onyx.user.domain.valueobject.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +29,39 @@ class UserEntityTest {
         assertThat(userEntity.oauthInfo.getProviderId()).isEqualTo("qwjsndwj23w");
         assertThat(userEntity.getPoints()).isZero();
 
+        // 기본 프로필 값 검증
+        assertThat(userEntity.getProfile()).isNotNull();
+        assertThat(userEntity.getProfile().getBio()).isEqualTo("Default bio");
+
+        // 기본 프로필 이미지 값 검증
+        assertThat(userEntity.getProfile().getProfileImage()).isNotNull();
+        assertThat(userEntity.getProfile().getProfileImage().getUrl()).isEqualTo("default-url");
+        assertThat(userEntity.getProfile().getProfileImage().getName()).isEqualTo("default-image");
+        assertThat(userEntity.getProfile().getProfileImage().getSize()).isZero();
+        assertThat(userEntity.getProfile().getProfileImage().getFormat()).isEqualTo("default-format");
+    }
+
+    @Test
+    @DisplayName("프로필 이미지를 수정한다.")
+    void updateProfile_shouldUpdateUserProfile() {
+        // given
+        String nickName = "운영자";
+        final Email email = Email.createFromFullAddress("dnshewhsy@google.com");
+        final OauthInfo oauthInfo = OauthInfo.create(Provider.GOOGLE, "qwjsndwj23w");
+        final UserEntity userEntity = UserEntity.create(nickName, email, oauthInfo);
+
+        ProfileImage newProfileImage = ProfileImage.create("newUrl", "newName", 200, "png");
+        Profile newProfile = Profile.create(newProfileImage, "Updated bio");
+
+        // when
+        userEntity.updateProfile(newProfile);
+
+        // then
+        assertThat(userEntity.getProfile().getBio()).isEqualTo("Updated bio");
+        assertThat(userEntity.getProfile().getProfileImage().getUrl()).isEqualTo("newUrl");
+        assertThat(userEntity.getProfile().getProfileImage().getName()).isEqualTo("newName");
+        assertThat(userEntity.getProfile().getProfileImage().getSize()).isEqualTo(200);
+        assertThat(userEntity.getProfile().getProfileImage().getFormat()).isEqualTo("png");
     }
 
 }

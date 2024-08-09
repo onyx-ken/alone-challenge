@@ -31,7 +31,7 @@ public class UserEntity {
     OauthInfo oauthInfo;
 
     @Embedded
-    Profile profile;
+    Profile profile = Profile.defaultProfile();
 
     private int points = 0;
 
@@ -57,8 +57,8 @@ public class UserEntity {
         return new UserEntity(nickName, emailAddress, oauthInfo);
     }
 
-    public void updateBio(String newBio) {
-        profile.updateBio(newBio);
+    public void updateProfile(Profile profile) {
+            this.profile.updateProfile(profile);
     }
 
     public static UserEntity fromOAuth2UserInfo(OAuth2UserInfo userInfo) {

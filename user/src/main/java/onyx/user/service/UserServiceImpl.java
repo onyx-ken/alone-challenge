@@ -3,6 +3,7 @@ package onyx.user.service;
 
 import lombok.RequiredArgsConstructor;
 import onyx.user.domain.entity.UserEntity;
+import onyx.user.domain.valueobject.Profile;
 import onyx.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,31 +29,9 @@ public class UserServiceImpl implements UserService{
     }
 
     @Transactional
-    public void updateNickName(Long userId, String newNickName) {
+    public void updateProfile(Long userId, Profile newProfile) {
         UserEntity user = getUserById(userId);
-        user.updateNickName(newNickName);
-    }
-
-    @Transactional
-    public void updateBio(Long userId, String newBio) {
-        UserEntity user = getUserById(userId);
-        user.updateBio(newBio);
-    }
-
-    /*
-    public void updateProfileImage(Long userId, String imageUrl, String imageId) {
-        UserEntity user = getUserById(userId);
-        user.updateProfileImage(imageUrl, imageId);
-        userRepository.save(user);
-    }
-    */
-
-    @Transactional
-    public void updateProfile(Long userId, String newNickName, String newBio, String imageUrl, String imageId) {
-        UserEntity user = getUserById(userId);
-        user.updateNickName(newNickName);
-        user.updateBio(newBio);
-        // user.updateProfileImage(imageUrl, imageId);
+        user.updateProfile(newProfile);
     }
 
     private UserEntity getUserById(Long userId) {
