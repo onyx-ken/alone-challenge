@@ -6,6 +6,7 @@ spring:
       local: local
       dev: dev, common
       prod: prod, common
+      test: local
   security:
     oauth2:
       client:
@@ -29,6 +30,9 @@ jwt:
   refresh-token:
     expiration-time: 604800000
 
+storage:
+  path:
+    profile: upload/files/profile
 ---
 
 spring:
@@ -132,3 +136,12 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+jwt:
+  secret: forTestValue_1231231qweqwe
