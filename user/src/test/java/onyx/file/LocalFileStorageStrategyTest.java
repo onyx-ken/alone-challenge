@@ -1,19 +1,17 @@
 package onyx.file;
 
 
-import org.junit.jupiter.api.BeforeEach;
+import onyx.file.domain.FileInfo;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,41 +22,47 @@ class LocalFileStorageStrategyTest {
     @Autowired
     private LocalFileStorageStrategy localFileStorageStrategy;
 
-    @Mock
-    private MultipartFile mockMultipartFile;
-
-    @Value("${storage.path}")
+    @Value("${storage.path.profile}")
     private String uploadDir;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void shouldSaveFileAndReturnFilePath() throws IOException {
         // given
-        String subDir = "profile";
         String fileName = "testFile.txt";
-        byte[] content = "test content".getBytes();
-        mockMultipartFile = new MockMultipartFile("file", fileName, "text/plain", content);
-        String expectedFilePath = new File(uploadDir + File.separator + subDir + File.separator + fileName).getAbsolutePath();
+        File tempFile = File.createTempFile("testFile", ".txt");
+
+        // Write some content to the temporary file to set its size
+        try (FileWriter writer = new FileWriter(tempFile)) {
+            writer.write("test content");
+        }
+
+        String expectedFilePath = new File(uploadDir + fileName).getAbsolutePath();
+        long expectedFileSize = tempFile.length();
+        String expectedFileFormat = "txt";
+        String expectedContentType = Files.probeContentType(tempFile.toPath());
 
         // when
-        String savedFilePath = localFileStorageStrategy.saveFile(mockMultipartFile, subDir, fileName);
+        FileInfo savedFileInfo = localFileStorageStrategy.saveFile(tempFile, uploadDir, fileName);
 
         // then
-        assertThat(savedFilePath).isEqualTo(expectedFilePath);
-        File savedFile = new File(savedFilePath);
+        assertThat(savedFileInfo.getPath()).isEqualTo(expectedFilePath);
+        assertThat(savedFileInfo.getName()).isEqualTo(fileName);
+        assertThat(savedFileInfo.getSize()).isEqualTo(expectedFileSize);
+        assertThat(savedFileInfo.getFormat()).isEqualTo(expectedFileFormat);
+        assertThat(savedFileInfo.getContentType()).isEqualTo(expectedContentType);
+
+        File savedFile = savedFileInfo.getFile();
         assertThat(savedFile).exists();
+        assertThat(savedFile.getName()).isEqualTo(fileName);
+        assertThat(savedFile.length()).isEqualTo(expectedFileSize);
+        assertThat(savedFile.getAbsolutePath()).isEqualTo(expectedFilePath);
     }
 
     @Test
     void shouldDeleteFileSuccessfully() {
         // given
-        String subDir = "profile";
         String fileName = "testFileToDelete.txt";
-        String filePath = uploadDir + File.separator + subDir + File.separator + fileName;
+        String filePath = uploadDir + fileName;
         File file = new File(filePath);
         file.getParentFile().mkdirs(); // Ensure directories are created
         try {
@@ -68,23 +72,45 @@ class LocalFileStorageStrategyTest {
         }
 
         // when
-        localFileStorageStrategy.deleteFile(subDir, fileName);
+        localFileStorageStrategy.deleteFile(uploadDir, fileName);
 
         // then
         assertThat(file.exists()).isFalse();
     }
 
     @Test
-    void shouldReturnCorrectFileUrl() {
+    void shouldReturnCorrectFileInfo() throws IOException {
         // given
-        String subDir = "profile";
         String fileName = "testFile.txt";
-        String expectedFileUrl = new File(uploadDir + File.separator + subDir + File.separator + fileName).getAbsolutePath();
+        String content = "test content";
+        File tempFile = new File(uploadDir + fileName);
+
+        tempFile.getParentFile().mkdirs();
+
+        // Write content to the file
+        try (FileWriter writer = new FileWriter(tempFile)) {
+            writer.write(content);
+        }
+
+        String expectedFilePath = tempFile.getAbsolutePath();
+        long expectedFileSize = tempFile.length();
+        String expectedFileFormat = "txt";
+        String expectedContentType = Files.probeContentType(tempFile.toPath());
 
         // when
-        String fileUrl = localFileStorageStrategy.getFileUrl(subDir, fileName);
+        FileInfo fileInfo = localFileStorageStrategy.getFileInfo(uploadDir, fileName);
 
         // then
-        assertThat(fileUrl).isEqualTo(expectedFileUrl);
+        assertThat(fileInfo.getPath()).isEqualTo(expectedFilePath);
+        assertThat(fileInfo.getName()).isEqualTo(fileName);
+        assertThat(fileInfo.getSize()).isEqualTo(expectedFileSize);
+        assertThat(fileInfo.getFormat()).isEqualTo(expectedFileFormat);
+        assertThat(fileInfo.getContentType()).isEqualTo(expectedContentType);
+
+        File retrievedFile = fileInfo.getFile();
+        assertThat(retrievedFile).exists();
+        assertThat(retrievedFile.getName()).isEqualTo(fileName);
+        assertThat(retrievedFile.length()).isEqualTo(expectedFileSize);
+        assertThat(retrievedFile.getAbsolutePath()).isEqualTo(expectedFilePath);
     }
 }

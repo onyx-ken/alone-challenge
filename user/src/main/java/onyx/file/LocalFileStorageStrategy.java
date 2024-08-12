@@ -1,9 +1,9 @@
 package onyx.file;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.multipart.MultipartFile;
+import onyx.file.domain.FileInfo;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,33 +11,34 @@ import java.nio.file.Paths;
 
 public class LocalFileStorageStrategy implements FileStorageStrategy {
 
-    @Value("${storage.path}")
-    private String rootUploadDir;
-
     @Override
-    public String saveFile(MultipartFile file, String subDir, String fileName) throws IOException {
-        // rootUploadDir 경로 아래의 서브 디렉토리를 포함한 경로 생성
-        Path fileStorageLocation = Paths.get(rootUploadDir, subDir).toAbsolutePath().normalize();
+    public FileInfo saveFile(File file, String uploadDir, String fileName) throws IOException {
+        Path fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
+        Files.createDirectories(fileStorageLocation); // 디렉토리 생성
         Path targetLocation = fileStorageLocation.resolve(fileName);
 
-        Files.createDirectories(fileStorageLocation); // 디렉토리 생성
-        file.transferTo(targetLocation.toFile());
+        Files.copy(file.toPath(), targetLocation); // 파일 저장
 
-        return targetLocation.toString();
+        return FileInfo.create(targetLocation.toString(), fileName, file.length(), Files.probeContentType(targetLocation));
     }
 
     @Override
-    public void deleteFile(String subDir, String fileUrl) {
-        Path fileLocation = Paths.get(rootUploadDir, subDir).toAbsolutePath().normalize().resolve(fileUrl);
-        File file = fileLocation.toFile();
+    public void deleteFile(String uploadDir, String fileName) {
+        File file = new File(uploadDir + fileName);
         if (file.exists()) {
             file.delete();
         }
     }
 
     @Override
-    public String getFileUrl(String subDir, String fileName) {
-        Path fileStorageLocation = Paths.get(rootUploadDir, subDir).toAbsolutePath().normalize();
-        return fileStorageLocation.resolve(fileName).toString();
+    public FileInfo getFileInfo(String uploadDir, String fileName) throws IOException {
+        Path filePath = Paths.get(uploadDir).toAbsolutePath().normalize().resolve(fileName);
+        File file = filePath.toFile();
+
+        if (!file.exists()) {
+            throw new FileNotFoundException("File not found: " + fileName);
+        }
+
+        return FileInfo.create(filePath.toString(), fileName, file.length(), Files.probeContentType(filePath));
     }
 }

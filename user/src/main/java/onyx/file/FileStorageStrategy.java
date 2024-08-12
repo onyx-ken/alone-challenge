@@ -1,11 +1,12 @@
 package onyx.file;
 
-import org.springframework.web.multipart.MultipartFile;
+import onyx.file.domain.FileInfo;
 
+import java.io.File;
 import java.io.IOException;
 
 public interface FileStorageStrategy {
-    String saveFile(MultipartFile file, String subDir, String fileName) throws IOException;
+    FileInfo saveFile(File file, String uploadDir, String fileName) throws IOException;
     void deleteFile(String subDir, String fileUrl);
-    String getFileUrl(String subDir, String fileName);
+    FileInfo getFileInfo(String uploadDir, String fileName) throws IOException;
 }
