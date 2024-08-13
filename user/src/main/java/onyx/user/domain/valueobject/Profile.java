@@ -25,8 +25,12 @@ public class Profile {
     }
 
     public void updateProfile(Profile profile) {
-        updateProfileImage(profile.getProfileImage());
-        updateBio(profile.getBio());
+        if (profile.getProfileImage() != null) {
+            updateProfileImage(profile.getProfileImage());
+        }
+        if (profile.getBio() != null && !profile.getBio().isEmpty()) {
+            updateBio(profile.getBio());
+        }
     }
 
     private void updateBio(String bio) {

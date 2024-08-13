@@ -15,6 +15,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "USERS")
+@SecondaryTables({
+        @SecondaryTable(name = "OAUTH_INFO", pkJoinColumns = @PrimaryKeyJoinColumn(name = "user_id")),
+        @SecondaryTable(name = "PROFILE", pkJoinColumns = @PrimaryKeyJoinColumn(name = "user_id"))
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class UserEntity {
@@ -28,9 +32,17 @@ public class UserEntity {
     private Email email;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "provider", column = @Column(table = "OAUTH_INFO", name = "provider")),
+            @AttributeOverride(name = "providerId", column = @Column(table = "OAUTH_INFO", name = "provider_id"))
+    })
     OauthInfo oauthInfo;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "profileImage", column = @Column(table = "PROFILE", name = "profile_image")),
+            @AttributeOverride(name = "bio", column = @Column(table = "PROFILE", name = "bio"))
+    })
     Profile profile = Profile.defaultProfile();
 
     private int points = 0;
@@ -66,4 +78,5 @@ public class UserEntity {
         OauthInfo oauthInfo = OauthInfo.create(userInfo.getProvider(), userInfo.getProviderId());
         return UserEntity.create(userInfo.getName(), email, oauthInfo);
     }
+
 }
