@@ -1,33 +1,32 @@
 package onyx.user.domain.valueobject;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import onyx.file.domain.FileInfo;
 
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileImage {
 
-    private String url;
-    private String name;
-    private long size;
-    private String format;
-
-    public static ProfileImage create(String url, String name, long size, String format) {
-        return new ProfileImage(url, name, size, format);
-    }
-
-    private ProfileImage(String url, String name, long size, String format) {
-        this.url = url;
-        this.name = name;
-        this.size = size;
-        this.format = format;
-    }
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "file_info_id")
+    private FileInfo fileInfo;
 
     public static ProfileImage defaultImage() {
-        return new ProfileImage("default-url", "default-image", 0, "default-format");
+        return new ProfileImage();
     }
 
+    public static ProfileImage create(FileInfo fileInfo) {
+        return new ProfileImage(fileInfo);
+    }
+
+    private ProfileImage(FileInfo fileInfo) {
+        this.fileInfo = fileInfo;
+    }
 }

@@ -19,7 +19,7 @@ public class LocalFileStorageStrategy implements FileStorageStrategy {
 
         Files.copy(file.toPath(), targetLocation); // 파일 저장
 
-        return FileInfo.create(targetLocation.toString(), fileName, file.length(), Files.probeContentType(targetLocation));
+        return FileInfo.create(targetLocation.toString(), file.getName(), fileName, file.length(), Files.probeContentType(targetLocation));
     }
 
     @Override
@@ -39,6 +39,6 @@ public class LocalFileStorageStrategy implements FileStorageStrategy {
             throw new FileNotFoundException("File not found: " + fileName);
         }
 
-        return FileInfo.create(filePath.toString(), fileName, file.length(), Files.probeContentType(filePath));
+        return FileInfo.create(filePath.toString(), fileName, file.getName(),file.length(), Files.probeContentType(filePath));
     }
 }

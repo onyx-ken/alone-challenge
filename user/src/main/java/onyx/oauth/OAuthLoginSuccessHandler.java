@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onyx.oauth.token.service.TokenService;
 import onyx.user.domain.entity.UserEntity;
-import onyx.user.service.UserService;
+import onyx.user.service.UserAuthenticationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -26,21 +26,21 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
     @Value("${jwt.redirect}")
     private String REDIRECT_URI;
 
-    private final UserService userService;
+    private final UserAuthenticationService userAuthenticationService;
     private final TokenService tokenService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
         OAuth2UserInfo oAuth2UserInfo = extractOAuth2UserInfo((OAuth2AuthenticationToken) authentication);
-        Optional<UserEntity> optionalUser = userService.findUserByOauthProviderId(oAuth2UserInfo.getProviderId());
+        Optional<UserEntity> optionalUser = userAuthenticationService.findUserByOauthProviderId(oAuth2UserInfo.getProviderId());
 
         UserEntity userEntity = optionalUser
                 .map(existingUser -> {
                     tokenService.revokeAccessToken(existingUser); // 기존 유저의 토큰 삭제
                     return existingUser; // 기존 유저 객체 반환
                 })
-                .orElseGet(() -> userService.register(UserEntity.fromOAuth2UserInfo(oAuth2UserInfo))); // 신규 유저 등록 및 객체 반환
+                .orElseGet(() -> userAuthenticationService.register(UserEntity.fromOAuth2UserInfo(oAuth2UserInfo))); // 신규 유저 등록 및 객체 반환
 
         handleTokensAndRedirect(request, response, userEntity);
     }

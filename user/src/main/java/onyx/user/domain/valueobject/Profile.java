@@ -1,10 +1,10 @@
 package onyx.user.domain.valueobject;
 
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import onyx.file.domain.FileInfo;
 
 @Embeddable
 @Getter

@@ -16,10 +16,10 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class UserServiceTest {
+class UserAuthenticationServiceTest {
 
     @Autowired
-    private UserService userService;
+    private UserAuthenticationService userAuthenticationService;
 
     @Autowired
     private UserRepository userRepository;
@@ -41,7 +41,7 @@ class UserServiceTest {
         final UserEntity userToSave = UserEntity.create(nickName, email, oauthInfo);
 
         // WHEN
-        userService.register(userToSave);
+        userAuthenticationService.register(userToSave);
 
         // THEN
         UserEntity savedUser = userRepository.findByEmail(Email.createFromFullAddress(StringEmailAddress)).orElseThrow();

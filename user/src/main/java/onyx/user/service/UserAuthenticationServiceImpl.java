@@ -13,7 +13,7 @@ import java.util.Optional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserAuthenticationServiceImpl implements UserAuthenticationService {
 
     private final UserRepository userRepository;
 
@@ -26,17 +26,6 @@ public class UserServiceImpl implements UserService{
     @Override
     public Optional<UserEntity> findUserByOauthProviderId(String providerId) {
         return userRepository.findByOauthInfoProviderId(providerId);
-    }
-
-    @Transactional
-    public void updateProfile(Long userId, Profile newProfile) {
-        UserEntity user = getUserById(userId);
-        user.updateProfile(newProfile);
-    }
-
-    private UserEntity getUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("사용자정보를 찾을 수 없습니다. : " + userId));
     }
 
 }

@@ -1,31 +1,50 @@
 package onyx.file.domain;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.File;
 
+@Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FileInfo {
 
-    private final String path;
-    private final String name;
-    private final long size;
-    private final String format;
-    private final String contentType;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String path;
+
+    private String originalName;
+
+    private String storedName;
+
+    private long size;
+
+    private String format;
+
+    private String contentType;
 
     public File getFile() {
         return new File(path);
     }
 
-    public static FileInfo create(String path, String name, long size, String contentType) {
-        return new FileInfo(path, name, size, contentType);
+    public static FileInfo create(String path, String name, String originalName, long size, String contentType) {
+        return new FileInfo(path, name, originalName, size, contentType);
     }
 
-    private FileInfo(String path, String name, long size, String contentType) {
+    private FileInfo(String path, String originalName, String storedName, long size, String contentType) {
         this.path = path;
-        this.name = name;
+        this.originalName = originalName;
+        this.storedName = storedName;
         this.size = size;
-        this.format = getFileExtension(name);
+        this.format = getFileExtension(storedName);
         this.contentType = contentType;
     }
 
@@ -33,4 +52,5 @@ public class FileInfo {
         int dotIndex = fileName.lastIndexOf('.');
         return dotIndex >= 0 ? fileName.substring(dotIndex + 1) : "";
     }
+
 }
