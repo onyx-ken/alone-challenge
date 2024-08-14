@@ -44,7 +44,7 @@ public class FileInfo {
         this.originalName = originalName;
         this.storedName = storedName;
         this.size = size;
-        this.format = getFileExtension(storedName);
+        this.format = getFileExtension(originalName);
         this.contentType = contentType;
     }
 
