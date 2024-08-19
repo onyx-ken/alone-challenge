@@ -1,8 +1,8 @@
 package onyx.config;
 
 import lombok.RequiredArgsConstructor;
-import onyx.oauth.OAuthLoginFailureHandler;
-import onyx.oauth.OAuthLoginSuccessHandler;
+import onyx.oauth.handler.OAuthLoginFailureHandler;
+import onyx.oauth.handler.OAuthLoginSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;

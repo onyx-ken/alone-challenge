@@ -1,9 +1,11 @@
-package onyx.oauth;
+package onyx.oauth.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onyx.oauth.GoogleUserInfo;
+import onyx.oauth.OAuth2UserInfo;
 import onyx.oauth.token.service.TokenService;
 import onyx.user.domain.entity.UserEntity;
 import onyx.user.service.UserAuthenticationService;

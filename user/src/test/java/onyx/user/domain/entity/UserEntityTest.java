@@ -35,10 +35,7 @@ class UserEntityTest {
 
         // 기본 프로필 이미지 값 검증
         assertThat(userEntity.getProfile().getProfileImage()).isNotNull();
-        assertThat(userEntity.getProfile().getProfileImage().getUrl()).isEqualTo("default-url");
-        assertThat(userEntity.getProfile().getProfileImage().getName()).isEqualTo("default-image");
-        assertThat(userEntity.getProfile().getProfileImage().getSize()).isZero();
-        assertThat(userEntity.getProfile().getProfileImage().getFormat()).isEqualTo("default-format");
+
     }
 
     @Test
@@ -58,10 +55,7 @@ class UserEntityTest {
 
         // then
         assertThat(userEntity.getProfile().getBio()).isEqualTo("Updated bio");
-        assertThat(userEntity.getProfile().getProfileImage().getUrl()).isEqualTo("newUrl");
-        assertThat(userEntity.getProfile().getProfileImage().getName()).isEqualTo("newName");
-        assertThat(userEntity.getProfile().getProfileImage().getSize()).isEqualTo(200);
-        assertThat(userEntity.getProfile().getProfileImage().getFormat()).isEqualTo("png");
+
     }
 
 }

@@ -8,7 +8,6 @@ import redis.embedded.RedisServer;
 
 import java.io.IOException;
 
-@Slf4j
 @Configuration
 public class RedisEmbeddedConfig {
 
