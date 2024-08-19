@@ -7,13 +7,14 @@ import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import onyx.common.BaseJPAEntity;
 
 import java.io.File;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FileInfo {
+public class FileInfo extends BaseJPAEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
