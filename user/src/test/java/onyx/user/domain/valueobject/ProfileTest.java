@@ -10,13 +10,13 @@ class ProfileTest {
 
     @BeforeEach
     void setUp() {
-        profile = Profile.create(profileImage, "Initial bio");
+        profile = Profile.defaultProfile();
     }
 
     @Test
     void updateProfile_shouldUpdateBioAndProfileImage() {
         // given
-        Profile newProfile = Profile.create(newProfileImage, "Updated bio");
+        Profile newProfile = Profile.create(ProfileImage.defaultImage(), "Updated bio");
 
         // when
         profile.updateProfile(newProfile);

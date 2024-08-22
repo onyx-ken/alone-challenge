@@ -47,7 +47,7 @@ class UserEntityTest {
         final OauthInfo oauthInfo = OauthInfo.create(Provider.GOOGLE, "qwjsndwj23w");
         final UserEntity userEntity = UserEntity.create(nickName, email, oauthInfo);
 
-        ProfileImage newProfileImage = ProfileImage.create("newUrl", "newName", 200, "png");
+        ProfileImage newProfileImage = ProfileImage.defaultImage();
         Profile newProfile = Profile.create(newProfileImage, "Updated bio");
 
         // when
