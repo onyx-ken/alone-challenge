@@ -1,7 +1,8 @@
 package onyx.user.web;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import onyx.oauth.token.domain.RefreshTokenRedis;
+import onyx.oauth.jwt.JwtUtil;
 import onyx.oauth.token.service.RefreshTokenService;
 import onyx.user.domain.entity.UserEntity;
 import onyx.user.domain.valueobject.*;
@@ -11,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +22,8 @@ public class UserController {
     private final RefreshTokenService refreshTokenService;
 
     private final UserInfoService userInfoService;
+
+    private final JwtUtil jwtUtil;
 
     /**
      * for Test in SpringCloud or SimpleAPI Call
@@ -48,9 +50,9 @@ public class UserController {
         return new ResponseEntity<>(registeredUser.getNickName(), HttpStatus.CREATED);
     }
 
-    @PutMapping("/users/{userId}/info")
+    @PutMapping("/users/{userId}/profile")
     public ResponseEntity<Void> updateUserInfo(@PathVariable Long userId,
-                                               @ModelAttribute UserInfoUpdateRequest request) {
+                                               @ModelAttribute UserProfileUpdateRequest request) {
         try {
             userInfoService.updateUserInfo(userId, request);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -61,11 +63,43 @@ public class UserController {
 
     @GetMapping("/token/{userId}")
     public ResponseEntity<String> getUsersTokenInfo(@PathVariable Long userId) {
-        Optional<RefreshTokenRedis> refreshTokenByUserId = refreshTokenService.findRefreshTokenByUserId(userId);
 
-        return refreshTokenByUserId
+        return refreshTokenService.findRefreshTokenByUserId(userId)
                 .map(refreshTokenRedis -> new ResponseEntity<>(refreshTokenRedis.getToken(), HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>("Token not found", HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserInfoResponse> getUserInfo(@PathVariable Long userId) {
+
+        return userInfoService.getUserInfo(userId)
+                .map(UserInfoResponse::from)  // UserEntity -> UserInfoResponse 변환
+                .map(ResponseEntity::ok)  // UserInfoResponse -> ResponseEntity로 변환
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)); // 없을 경우 404 반환
+    }
+
+    @GetMapping("/users/me/profile")
+    public ResponseEntity<UserInfoResponse> getCurrentUserInfo(HttpServletRequest request) {
+
+        return userInfoService.getUserInfo(Long.valueOf(jwtUtil.getUserIdFromHeader(request)))
+                .map(UserInfoResponse::from)  // UserEntity -> UserInfoResponse 변환
+                .map(ResponseEntity::ok)  // UserInfoResponse -> ResponseEntity로 변환
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null)); // 없을 경우 404 반환
+    }
+
+    @PutMapping("/users/me/profile")
+    public ResponseEntity<Void> updateUserProfile(HttpServletRequest request,
+                                                  @ModelAttribute UserProfileUpdateRequest userProfileUpdateRequest) {
+        try {
+            // 사용자 정보 업데이트
+            userInfoService.updateUserInfo(Long.valueOf(jwtUtil.getUserIdFromHeader(request)), userProfileUpdateRequest);
+
+            // 업데이트 성공 응답
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            // 모든 예외처리, 추후 사용자 찾지 못하는 경우, 권한 없는 경우 등 에러 추가 처리 필요.
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

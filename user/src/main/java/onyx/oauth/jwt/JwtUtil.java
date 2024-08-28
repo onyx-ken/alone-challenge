@@ -4,6 +4,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import onyx.oauth.error.TokenErrorResult;
 import onyx.oauth.error.TokenException;
@@ -49,8 +50,8 @@ public class JwtUtil {
     }
 
     // 응답 헤더에서 액세스 토큰을 반환하는 메서드
-    public String getTokenFromHeader(String authorizationHeader) {
-        return authorizationHeader.substring(7);
+    public String getTokenFromHeader(HttpServletRequest request) {
+        return request.getHeader("Authorization").substring(7);
     }
 
     // 토큰에서 유저 id를 반환하는 메서드
@@ -69,6 +70,10 @@ public class JwtUtil {
             log.warn("유효하지 않은 토큰입니다.");
             throw new TokenException(TokenErrorResult.INVALID_TOKEN);
         }
+    }
+
+    public String getUserIdFromHeader(HttpServletRequest request) {
+        return getUserIdFromToken(getTokenFromHeader(request));
     }
 
     // Jwt 토큰의 유효기간을 확인하는 메서드

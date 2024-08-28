@@ -33,7 +33,7 @@ public class Profile {
         }
     }
 
-    private void updateBio(String bio) {
+    public void updateBio(String bio) {
         this.bio = bio;
     }
 

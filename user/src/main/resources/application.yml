@@ -22,9 +22,12 @@ spring:
     redis:
       host: localhost
       port: 6370
+  servlet:
+    multipart:
+      max-file-size: 10MB
 jwt:
   secret: ${JWT_SECRET}
-  redirect: http://localhost:8001/login?name=%s&access_token=%s
+  redirect: http://localhost:5173/oauth-callback?name=%s&access_token=%s
   access-token:
     expiration-time: 3600000
   refresh-token:
