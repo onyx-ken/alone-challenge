@@ -7,6 +7,6 @@ import java.io.IOException;
 
 public interface FileStorageStrategy {
     FileInfo saveFile(File file, String uploadDir, String fileName) throws IOException;
-    void deleteFile(String uploadDir, String fileUrl);
+    void deleteFile(String uploadPath);
     FileInfo getFileInfo(String uploadDir, String fileName) throws IOException;
 }

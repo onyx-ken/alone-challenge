@@ -1,5 +1,6 @@
 package onyx.file;
 
+import lombok.extern.slf4j.Slf4j;
 import onyx.file.domain.FileInfo;
 
 import java.io.File;
@@ -9,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@Slf4j
 public class LocalFileStorageStrategy implements FileStorageStrategy {
 
     @Override
@@ -24,10 +26,13 @@ public class LocalFileStorageStrategy implements FileStorageStrategy {
     }
 
     @Override
-    public void deleteFile(String uploadDir, String fileName) {
-        File file = new File(uploadDir + fileName);
-        if (file.exists()) {
-            file.delete();
+    public void deleteFile(String uploadPath) {
+        Path path = Paths.get(uploadPath);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException("파일 삭제 실패", e);
         }
     }
 
@@ -37,7 +42,7 @@ public class LocalFileStorageStrategy implements FileStorageStrategy {
         File file = filePath.toFile();
 
         if (!file.exists()) {
-            throw new FileNotFoundException("File not found: " + fileName);
+            throw new FileNotFoundException("파일을 찾을 수 없습니다: " + fileName);
         }
 
         return FileInfo.create(filePath.toString(), fileName, file.getName(),

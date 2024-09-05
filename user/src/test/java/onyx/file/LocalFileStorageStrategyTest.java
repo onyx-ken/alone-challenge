@@ -72,7 +72,7 @@ class LocalFileStorageStrategyTest {
         }
 
         // when
-        localFileStorageStrategy.deleteFile(uploadDir, fileName);
+        localFileStorageStrategy.deleteFile(filePath);
 
         // then
         assertThat(file.exists()).isFalse();
