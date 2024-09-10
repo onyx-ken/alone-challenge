@@ -6,7 +6,7 @@
         {
             id: 1,
             user: { name: 'user1', avatar: 'https://i.pravatar.cc/150?img=1' },
-            imageUrl: '', // Placeholder for the image URL to be fetched
+            imageUrl: 'https://cdn2.thecatapi.com/images/8ru.jpg', // Placeholder for the image URL to be fetched
             content: "This is a sample post content that could be very long, and will need a 'Read More' button if it exceeds a certain length.",
             likes: 123,
             comments: [
@@ -21,7 +21,7 @@
         {
             id: 2,
             user: {name: 'user2', avatar: 'https://i.pravatar.cc/150?img=2'},
-            imageUrl: '', // Placeholder for the image URL to be fetched
+            imageUrl: 'https://cdn2.thecatapi.com/images/c23.jpg', // Placeholder for the image URL to be fetched
             content: "Another post with some different content. It could also be long and will need a 'Read More' button.",
             likes: 56,
             comments: [
@@ -31,26 +31,6 @@
             ]
         }
     ];
-
-    // Fetching the cat image URLs
-    async function fetchCatImages() {
-        try {
-            const response = await fetch('https://api.thecatapi.com/v1/images/search?limit=2'); // Requesting 2 images
-            const data = await response.json();
-
-            // Updating the posts array with the fetched image URLs
-            posts = posts.map((post, index) => ({
-                ...post,
-                imageUrl: data[index]?.url || post.imageUrl // Update the imageUrl if available, else keep the old value
-            }));
-        } catch (error) {
-            console.error('Error fetching cat images:', error);
-        }
-    }
-
-    onMount(() => {
-        fetchCatImages();
-    });
 </script>
 
 <div class="feed">

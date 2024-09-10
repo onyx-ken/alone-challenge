@@ -1,4 +1,6 @@
 <script>
+    import { goto } from '$app/navigation';
+
     export let user;
     export let imageUrl;
     export let content;
@@ -23,13 +25,19 @@
         isLiked = !isLiked;
         likes += isLiked ? 1 : -1;
     }
+
+    function handleClick() {
+        goto('/profile');
+    }
 </script>
 
 <div class="post card bg-base-100 w-full shadow-md mb-6">
     <!-- User Info -->
     <div class="post-header flex items-center p-4">
-        <img src={user.avatar} alt="avatar" class="rounded-full h-12 w-12 mr-4"/>
-        <p class="font-semibold">{user.name}</p>
+        <div class="flex items-center cursor-pointer" on:click={handleClick}>
+            <img src={user.avatar} alt="avatar" class="rounded-full h-12 w-12 mr-4"/>
+            <p class="font-semibold">{user.name}</p>
+        </div>
     </div>
 
     <!-- Post Image -->
@@ -55,16 +63,14 @@
     <div class="post-actions flex items-center justify-between p-4">
         <button class="btn btn-ghost btn-square" on:click={toggleLike}>
             {#if isLiked}
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="currentColor"
-                     viewBox="0 0 24 24" stroke="none">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6.14 3.91 4 6.5 4c1.74 0 3.41.81 4.5 2.09C12.09 4.81 13.76 4 15.5 4 18.09 4 20 6.14 20 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 text-red-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                 </svg>
             {:else}
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6.14 3.91 4 6.5 4c1.74 0 3.41.81 4.5 2.09C12.09 4.81 13.76 4 15.5 4 18.09 4 20 6.14 20 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                 </svg>
+
             {/if}
         </button>
         <div>
