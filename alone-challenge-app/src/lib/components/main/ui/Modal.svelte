@@ -9,7 +9,6 @@
 
     const dispatch = createEventDispatcher();
     export let onClose = () => {};
-    export let onPost = () => {};
 
     let step = 1;
     let uploadedImages = [];
@@ -17,13 +16,13 @@
     let selectedBackground = "/background1.png"; // 기본 배경 이미지
     let userText = ""; // 사용자 입력 글
 
-    function handleKeydown(event) {
+    const handleKeydown = (event) => {
         if (event.key === 'Escape') {
             onClose();
         }
     }
 
-    function handleImageUpload(event) {
+    const handleImageUpload = (event) => {
         const files = event.detail;
         if (Array.isArray(files) && files.length > 0) {
             uploadedImages = files.map(file => ({
@@ -36,15 +35,15 @@
         }
     }
 
-    function handleCropComplete(croppedAreaPixels) {
+    const handleCropComplete = (croppedAreaPixels) => {
         selectedImageData = croppedAreaPixels;
     }
 
-    function handleImageEdit() {
+    const handleImageEdit = () => {
         step = 3;
     }
 
-    function handleNextClick() {
+    const handleNextClick = () => {
         if (step === 1 && uploadedImages.length === 0) {
             step = 3;
         } else {
@@ -52,7 +51,7 @@
         }
     }
 
-    function handlePreviousClick() {
+    const handlePreviousClick = () => {
         if (step === 2) {
             uploadedImages = [];
             step = 1;
@@ -65,16 +64,15 @@
         }
     }
 
-    function handleBackgroundSelect(event) {
+    const handleBackgroundSelect = (event) => {
         selectedBackground = event.detail; // 배경 선택 시 선택된 배경 이미지 변경
     }
 
-    function handleTextChange(event) {
+    const handleTextChange = (event) => {
         userText = event.target.value; // 입력된 글 내용 저장
     }
 
-    function selectBackground(background) {
-        console.log(background);
+    const selectBackground = (background) => {
         selectedBackground = background;
         dispatch('select', selectedBackground); // Svelte의 dispatch 함수를 사용해 이벤트 전달
     }
@@ -171,7 +169,6 @@
 
 <style>
     .modal-box {
-        background-color: #f9fafb;
         border-radius: 0.5rem;
         box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
     }

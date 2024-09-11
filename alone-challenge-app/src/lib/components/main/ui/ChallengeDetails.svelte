@@ -5,7 +5,6 @@
     import { format } from 'date-fns';
     import { onMount } from 'svelte';
 
-
     export let onDetailsSave = () => {};
 
     let dateRange = { from: new Date(), to: new Date(new Date().setDate(new Date().getDate() + 7)) };
@@ -19,11 +18,11 @@
     const positiveCategories = ['하겠습니다', '먹겠습니다', '마시겠습니다', '보겠습니다'];
     const negativeCategories = ['하지 않겠습니다', '먹지 않겠습니다', '마시지 않겠습니다', '보지 않겠습니다'];
 
-    function formatDate(date) {
+    const formatDate = (date) => {
         return format(date, 'yyyy.MM.dd');
     }
 
-    function handleSave() {
+    const handleSave = () =>{
         onDetailsSave({
             startDate: dateRange.from,
             endDate: dateRange.to,
@@ -56,13 +55,13 @@
         flatpickrInstance = Flatpickr(flatpickrInput, options);
     });
 
-    function openDatePicker() {
+    const openDatePicker = () => {
         if (flatpickrInstance) {
             flatpickrInstance.open();
         }
     }
 
-    function selectChallengeType(type) {
+    const selectChallengeType = (type) => {
         challengeType = type;
 
         // 선택한 도전 유형에 따라 첫 번째 카테고리를 기본으로 설정

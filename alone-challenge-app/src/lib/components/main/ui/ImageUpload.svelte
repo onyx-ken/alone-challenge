@@ -6,25 +6,22 @@
 
     const dispatch = createEventDispatcher();
 
-    function handleFileChange(event) {
+    const handleFileChange = (event) => {
         files = [...event.target.files];
-        console.log("handleFileChange: files =", files); // 디버깅을 위해 추가
         onUpload(files);
         dispatch('upload', files); // 배열을 직접 전달
     }
 
-    function removeFile(index) {
+    const removeFile = (index) => {
         files.splice(index, 1);
-        console.log("removeFile: files =", files); // 디버깅을 위해 추가
         onUpload(files);
         dispatch('upload', files); // 배열을 직접 전달
     }
 
-    function handleDrop(event) {
+    const handleDrop = (event) => {
         event.preventDefault();
         const droppedFiles = [...event.dataTransfer.files];
         files = [...files, ...droppedFiles];
-        console.log("handleDrop: files =", files); // 디버깅을 위해 추가
         onUpload(files);
         dispatch('upload', files); // 배열을 직접 전달
     }
@@ -34,6 +31,14 @@
         class="flex flex-col items-center space-y-4 border-dashed border-2 p-4 rounded-lg"
         on:drop={handleDrop}
         on:dragover|preventDefault
+        role="button"
+        tabindex="0"
+        aria-label="Image upload drop area"
+        on:keydown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            document.getElementById('image-upload').click();
+        }
+    }}
 >
     <input
             type="file"

@@ -14,7 +14,6 @@
             }
         });
     }
-
 </script>
 
 <svelte:head>

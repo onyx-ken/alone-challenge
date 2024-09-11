@@ -1,5 +1,9 @@
 <script>
     import PostDetailModal from '$lib/components/main/ui/PostDetailModal.svelte';
+    import HeartIcon from "$lib/components/icon/HeartIcon.svelte";
+    import MessgeIcon from "$lib/components/icon/MessgeIcon.svelte";
+    import DirectionIcon from "$lib/components/icon/DirectionIcon.svelte";
+    import XIcon from "$lib/components/icon/XIcon.svelte";
 
     let isFollowing = false;
     let selectedPost = null;  // 현재 선택된 게시물
@@ -103,21 +107,28 @@
     <!-- 포스트 리스트 -->
     <div class="grid grid-cols-3 gap-1 md:gap-4">
         {#each user.postsList as post}
-            <div class="relative group cursor-pointer" on:click={() => handlePostClick(post.id)}>
+            <div
+                    class="relative group cursor-pointer"
+                    role="button"
+                    tabindex="0"
+                    aria-label="View post"
+                    on:click={() => handlePostClick(post.id)}
+                    on:keydown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                        handlePostClick(post.id);
+                        }
+                    }}
+            >
                 <div class="card shadow-lg">
                     <img src={post.image} alt={`Post ${post.id}`} class="w-full aspect-square object-cover"/>
                     <div class="absolute inset-0 bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <div class="text-white flex items-center space-x-4">
                             <span class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                                </svg>
+                                <HeartIcon fill="none" className="w-6 h-6"/>
                                 {post.likes}
                             </span>
                             <span class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z"/>
-                                </svg>
+                                <MessgeIcon className="w-6 h-6"/>
                                 {post.comments}
                             </span>
                         </div>
@@ -129,29 +140,60 @@
 
     <!-- 모달 표시 -->
     {#if showModal && selectedPost}
-        <button class="fixed top-4 right-4 text-gray-600 hover:text-gray-800 z-50" style="z-index: 1001;" on:click={closeModal}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+        <!-- 닫기 버튼 -->
+        <button
+                class="fixed top-4 right-4 text-gray-600 hover:text-gray-800 z-50"
+                style="z-index: 1001;"
+                on:click={closeModal}
+                aria-label="Close modal"
+        >
+            <XIcon />
         </button>
-        <div class="fixed inset-0 bg-gray-800 bg-opacity-90 flex justify-center items-center z-50" on:click={handleClickOutside}>
+
+        <!-- 모달 배경 -->
+        <div
+                class="fixed inset-0 bg-gray-800 bg-opacity-90 flex justify-center items-center z-50 modal-overlay"
+                role="button"
+                tabindex="0"
+                aria-label="Close modal by clicking outside"
+                on:click={handleClickOutside}
+                on:keydown={(event) => {
+            if (event.key === 'Escape') closeModal(); // 'Escape' 키를 누르면 모달 닫기
+        }}
+        >
             <!-- 왼쪽 화살표 -->
             {#if selectedPostIndex > 0}
-                <button class="absolute left-4 text-white z-[1002]" on:click|stopPropagation={handlePrevPost}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
+                <button
+                        class="absolute left-4 text-white z-[1002]"
+                        on:click|stopPropagation={handlePrevPost}
+                        aria-label="Previous post"
+                        on:keydown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        handlePrevPost();
+                    }
+                }}
+                >
+                    <DirectionIcon />
                 </button>
             {/if}
+
             <!-- 모달 본체 -->
-            <div class="relative w-4/5 h-4/5 flex flex-col md:flex-row rounded-lg overflow-hidden shadow-lg">
+            <div class="relative w-4/5 h-4/5 flex flex-col md:flex-row rounded-lg overflow-hidden shadow-lg" role="dialog" aria-modal="true">
                 <PostDetailModal currentPostIndex={selectedPostIndex} onClose={closeModal} />
             </div>
+
             <!-- 오른쪽 화살표 -->
-            <button class="absolute right-4 text-white z-50" on:click={handleNextPost}>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
+            <button
+                    class="absolute right-4 text-white z-50"
+                    on:click={handleNextPost}
+                    aria-label="Next post"
+                    on:keydown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    handleNextPost();
+                }
+            }}
+            >
+                <DirectionIcon direction="right"/>
             </button>
         </div>
     {/if}

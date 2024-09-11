@@ -22,7 +22,7 @@
         }
     }
 
-    function handleCropComplete(croppedArea, croppedAreaPixelsResult) {
+    const handleCropComplete = (croppedAreaPixelsResult) => {
         croppedAreaPixels[selectedImageIndex] = croppedAreaPixelsResult;
         onCropComplete(croppedAreaPixels);
     }
@@ -47,11 +47,11 @@
         isTransitioning = false;
     }
 
-    function resetCropState() {
+    const resetCropState = () => {
         crop.set({ x: 0, y: 0 });
     }
 
-    function setAspect(ratio) {
+    const  setAspect = (ratio) => {
         aspect.set(ratio || 1); // 비율 설정, 원본(기본 비율)일 경우 1로 설정
         crop.set({ x: 0, y: 0 });  // 현재 보고 있는 이미지의 자르기 위치만 초기화
     }

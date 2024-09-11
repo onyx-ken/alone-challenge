@@ -1,7 +1,9 @@
 <script>
+    import { onMount } from 'svelte';
     import Card from '$lib/components/main/accounts/ui/Card.svelte';
-    import {onMount} from 'svelte';
-    import {getApiEndpoints} from '$lib/apiEndpoints';
+    import GoogleIcon from "$lib/components/icon/GoogleIcon.svelte";
+    import FaceBookIcon from "$lib/components/icon/FaceBookIcon.svelte";
+    import { getApiEndpoints } from '$lib/apiEndpoints';
 
     let nickName = "JohnDoe";
     let bio = "I'm passionate about setting and achieving goals!";
@@ -11,8 +13,7 @@
     let profileUrl = "";
     let profileImageId = 0;
 
-    const {USER} = getApiEndpoints(); // 환경에 따른 API 엔드포인트 주소 불러오기
-
+    const { USER } = getApiEndpoints();
     const maxLength = 150;
     let isOverLimit = false;
 
@@ -27,14 +28,8 @@
 
             if (response.ok) {
                 const data = await response.json();
-                nickName = data.nickName;
-                bio = data.bio;
-                points = data.points;
-                email = data.email;
-                provider = data.provider;
-                profileImageId = data.profileImageId;
+                ({ nickName, bio, points, email, provider, profileImageId } = data);
 
-                // profileImageId가 유효한 값일 때만 profileUrl을 업데이트
                 if (profileImageId !== 0) {
                     profileUrl = `${USER}/users/files/${profileImageId}`;
                 }
@@ -46,7 +41,7 @@
         }
     });
 
-    function handleAvatarChange(event) {
+    const handleAvatarChange = (event) => {
         const file = event.target.files?.[0];
         if (file) {
             const reader = new FileReader();
@@ -57,7 +52,7 @@
         }
     }
 
-    function handleBioInput(event) {
+    const handleBioInput = (event) => {
         bio = event.target.value;
         isOverLimit = bio.length > maxLength;
     }
@@ -69,12 +64,10 @@
         }
 
         try {
-            // FormData 객체 생성
             const formData = new FormData();
             formData.append('nickName', nickName);
             formData.append('bio', bio);
 
-            // 프로필 이미지가 있으면 FormData에 추가
             const fileInput = document.getElementById('profileImage');
             if (fileInput.files.length > 0) {
                 formData.append('profileImage', fileInput.files[0]);
@@ -85,7 +78,7 @@
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
                 },
-                body: formData // FormData 객체를 body에 포함
+                body: formData
             });
 
             if (response.ok) {
@@ -99,29 +92,12 @@
         }
     }
 
-    function getProviderIcon(provider) {
-        switch (provider) {
-            case 'GOOGLE':
-                return `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    </svg>`;
-            case 'FACEBOOK':
-                return `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M18 2h-4a4 4 0 00-4 4v4H6v4h4v8h4v-8h4l1-4h-5V6a1 1 0 011-1h4V2z"/>
-                    </svg>`;
-            case 'GITHUB':
-                return `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 2a10 10 0 00-3.16 19.48c.5.09.68-.22.68-.48v-1.7c-2.77.6-3.36-1.34-3.36-1.34-.45-1.16-1.11-1.48-1.11-1.48-.91-.62.07-.6.07-.6 1 .07 1.53 1.02 1.53 1.02.89 1.52 2.34 1.08 2.9.82.09-.65.35-1.08.64-1.32-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.26-.45-1.28.1-2.66 0 0 .84-.27 2.75 1.02A9.62 9.62 0 0112 7.5a9.62 9.62 0 012.49.34c1.9-1.29 2.74-1.02 2.74-1.02.55 1.38.21 2.4.11 2.66.65.7 1.03 1.59 1.03 2.68 0 3.85-2.35 4.68-4.59 4.93.36.31.68.91.68 1.84v2.73c0 .26.18.58.68.48A10 10 0 0012 2z"/>
-                    </svg>`;
-            default:
-                return ''; // 알 수 없는 provider는 아이콘 없음
-        }
+    const getProviderIcon = (provider) => {
+        const icons = {
+            'GOOGLE': GoogleIcon,
+            'FACEBOOK': FaceBookIcon,
+        };
+        return icons[provider] || null;
     }
 </script>
 
@@ -199,7 +175,9 @@
         <span class="font-semibold">연결된 계정 :</span>
         <div class="flex space-x-2 mt-2">
             <div class="badge badge-secondary flex items-center">
-                {@html getProviderIcon(provider)}
+                {#if getProviderIcon(provider)}
+                    <svelte:component this={getProviderIcon(provider)} />
+                {/if}
                 {provider}
             </div>
         </div>

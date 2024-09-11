@@ -5,7 +5,7 @@
     export let backgrounds = ["/background1.png", "/background2.png", "/background3.png"];
     export let selectedBackground = backgrounds[0];
 
-    function selectBackground(background) {
+    const selectBackground = (background) => {
         selectedBackground = background;
         console.log("Selected background:", selectedBackground); // 디버깅용
         dispatch('select', selectedBackground); // 선택된 배경을 상위 컴포넌트로 전달
