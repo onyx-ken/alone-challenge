@@ -1,5 +1,4 @@
 <script>
-    import { onMount } from 'svelte';
     import Post from './Post.svelte';
 
     let posts = [
