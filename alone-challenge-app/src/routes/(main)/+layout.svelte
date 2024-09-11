@@ -1,5 +1,4 @@
 <script>
-    import "tailwindcss/tailwind.css";
     import Header from "$lib/components/main/ui/Header.svelte";
     import { onMount } from "svelte";
     import { browser } from '$app/environment';
@@ -23,20 +22,5 @@
     }
 </script>
 
-<svelte:head>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
-</svelte:head>
-
 <Header {theme} {toggleTheme} />
 <slot />
-
-<style>
-    :global(html) {
-        overflow-y: scroll; /*스크롤 바 항상 표시 (CSS 깨짐 방지)*/
-    }
-    :global(body) {
-         font-family: 'Noto Sans KR', sans-serif;
-     }
-</style>
