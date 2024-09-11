@@ -91,13 +91,11 @@
                     {isFollowing ? "Following" : "Follow"}
                 </button>
             </div>
-
             <div class="flex justify-center md:justify-start space-x-8 mb-4">
                 <span><strong>{user.posts}</strong> posts</span>
                 <span><strong>{user.followers}</strong> followers</span>
                 <span><strong>{user.following}</strong> following</span>
             </div>
-
             <p class="text-sm">{user.bio}</p>
         </div>
     </div>
@@ -108,7 +106,7 @@
             <div class="relative group cursor-pointer" on:click={() => handlePostClick(post.id)}>
                 <div class="card shadow-lg">
                     <img src={post.image} alt={`Post ${post.id}`} class="w-full aspect-square object-cover"/>
-                    <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="absolute inset-0 bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                         <div class="text-white flex items-center space-x-4">
                             <span class="flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -146,7 +144,7 @@
                 </button>
             {/if}
             <!-- 모달 본체 -->
-            <div class="relative bg-white w-4/5 h-4/5 flex flex-col md:flex-row rounded-lg overflow-hidden shadow-lg">
+            <div class="relative w-4/5 h-4/5 flex flex-col md:flex-row rounded-lg overflow-hidden shadow-lg">
                 <PostDetailModal currentPostIndex={selectedPostIndex} onClose={closeModal} />
             </div>
             <!-- 오른쪽 화살표 -->

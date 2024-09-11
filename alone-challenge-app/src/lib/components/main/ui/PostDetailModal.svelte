@@ -118,15 +118,15 @@
 </script>
 
 <!-- 모달 배경 -->
-<div class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-    <div class="bg-white w-4/5 h-4/5 flex flex-col md:flex-row rounded-lg overflow-hidden shadow-lg relative">
+<div class="modal-overlay fixed inset-0 bg-opacity-50 flex justify-center items-center z-50">
+    <div class="w-4/5 h-4/5 flex flex-col md:flex-row rounded-lg overflow-hidden shadow-lg relative">
         <!-- 왼쪽: 게시물 이미지 영역 (1-3/5) -->
-        <div class="w-full md:w-3/5 bg-gray-200 flex items-center justify-center">
+        <div class="w-full md:w-3/5 bg-base-100 shadow-2xl flex items-center justify-center">
             <img src={post.image} alt="Post Image" class="max-h-full max-w-full object-cover"/>
         </div>
 
         <!-- 오른쪽: 게시물 세부 정보 및 프로필 영역 (2/5) -->
-        <div class="w-full md:w-2/5 flex flex-col p-4">
+        <div class="bg-base-100 shadow-2xl w-full md:w-2/5 flex flex-col p-4">
             <!-- 사용자 프로필 정보 -->
             <div class="flex items-center mb-4 space-x-4">
                 <img src={post.user.profileImage} alt={post.user.nickname} class="w-12 h-12 rounded-full mr-4"/>
