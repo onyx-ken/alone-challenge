@@ -1,16 +1,24 @@
 <script>
     import { onMount, onDestroy } from 'svelte';
-    import ImageUpload from './ImageUpload.svelte';
-    import ImageEdit from './ImageEdit.svelte';
+    import { createEventDispatcher } from 'svelte';
+    import ImageUpload from '$lib/components/main/ui/ImageUpload.svelte';
+    import ImageEdit from '$lib/components/main/ui/ImageEdit.svelte';
     import ChallengeDetails from '$lib/components/main/ui/ChallengeDetails.svelte';
     import ChallengeCertificate from '$lib/components/main/ui/ChallengeCertificate.svelte';
-    import BackgroundSelector from './BackgroundSelector.svelte';
-    import { createEventDispatcher } from 'svelte';
+    import BackgroundSelector from '$lib/components/main/ui/BackgroundSelector.svelte';
 
     const dispatch = createEventDispatcher();
     export let onClose = () => {};
 
-    let step = 1;
+    // Step 상수를 객체로 정의
+    const Step = {
+        UPLOAD: 1,
+        CROP: 2,
+        DETAILS: 3,
+        PREVIEW: 4
+    };
+
+    let step = Step.UPLOAD;  // 초기값을 상수로 설정
     let uploadedImages = [];
     let selectedImageData = {};
     let selectedBackground = "/background1.png"; // 기본 배경 이미지
@@ -29,7 +37,7 @@
                 file,
                 preview: URL.createObjectURL(file)
             }));
-            step = 2; // 이미지 업로드 후 자르기 단계로 이동
+            step = Step.CROP;  // 2단계: 이미지 자르기 단계로 이동
         } else {
             console.error("handleImageUpload: Expected an array, but got", typeof files);
         }
@@ -40,29 +48,33 @@
     }
 
     const handleImageEdit = () => {
-        step = 3;
+        step = Step.DETAILS;
     }
 
     const handleNextClick = () => {
-        if (step === 1 && uploadedImages.length === 0) {
-            step = 3;
-        } else {
-            step++;
+        if (step === Step.UPLOAD && uploadedImages.length === 0) {
+            step = Step.DETAILS;  // 이미지를 업로드하지 않은 경우, 바로 도전내용 작성으로 이동
+            return;
         }
-    }
+        step++;
+    };
 
     const handlePreviousClick = () => {
-        if (step === 2) {
+        if (step === Step.CROP) {
             uploadedImages = [];
-            step = 1;
-        } else if (step === 3) {
-            if (uploadedImages.length === 0) {
-                step = 1;
-            } else {
-                step = 2; // 2번째 단계로 이동
-            }
+            step = Step.UPLOAD;
+            return;
         }
-    }
+
+        if (step === Step.DETAILS) {
+            step = uploadedImages.length === 0 ? Step.UPLOAD : Step.CROP;
+            return;
+        }
+
+        if (step === Step.PREVIEW) {
+            step = Step.DETAILS;
+        }
+    };
 
     const handleBackgroundSelect = (event) => {
         selectedBackground = event.detail; // 배경 선택 시 선택된 배경 이미지 변경
@@ -88,10 +100,10 @@
         window.removeEventListener('keydown', handleKeydown);
     });
 
-    $: title = step === 1 ? "새로운 도전하기" :
-        step === 2 ? "이미지 자르기" :
-            step === 3 ? "도전 내용 작성하기" :
-                step === 4 ? "도전 공유하기" : "------";
+    $: title = step === Step.UPLOAD ? "새로운 도전하기" :
+        step === Step.CROP ? "이미지 자르기" :
+            step === Step.DETAILS ? "도전 내용 작성하기" :
+                step === Step.PREVIEW ? "도전 공유하기" : "------";
 </script>
 
 <div class="modal modal-open">
@@ -102,27 +114,26 @@
         <h3 class="font-bold text-lg mb-4">{title}</h3>
 
         <!-- 1단계: 이미지 업로드 -->
-        {#if step === 1}
+        {#if step === Step.UPLOAD}
             <ImageUpload on:upload={handleImageUpload} />
-        {:else if step === 2}
+        {:else if step === Step.CROP}
             <!-- 2단계: 이미지 자르기 -->
             <ImageEdit
                     images={uploadedImages}
                     onSave={handleImageEdit}
                     onCropComplete={handleCropComplete}
             />
-        {:else if step === 3}
+        {:else if step === Step.DETAILS}
             <!-- 3단계: 도전 내용 작성 -->
             <ChallengeDetails />
         {/if}
 
         <!-- 4단계: 도전 공유 (도전장 미리보기, 배경 선택, 글 작성) -->
-        {#if step === 4}
+        {#if step === Step.PREVIEW}
             <div class="flex space-x-8">
                 <!-- 왼쪽: 도전장 미리보기 -->
                 <div class="w-2/3">
                     <h3 class="font-bold text-lg mb-4"> 미리보기</h3>
-                    <!-- 도전장 미리보기 화면을 모달 크기에 맞게 축소 -->
                     <div class="certificate-preview">
                         <ChallengeCertificate background={selectedBackground} />
                     </div>
@@ -144,22 +155,22 @@
 
         <!-- 하단 네비게이션 -->
         <div class="modal-action flex justify-between items-center">
-            {#if step === 1}
+            {#if step === Step.UPLOAD}
                 <p class="text-sm text-gray-500 text-center mx-auto">이미지 없이도 도전을 할 수 있습니다.</p>
                 <button class="btn btn-primary ml-auto" on:click={handleNextClick}>다음</button>
             {/if}
 
-            {#if step === 2}
+            {#if step === Step.CROP}
                 <button class="btn btn-outline" on:click={handlePreviousClick}>이전</button>
                 <button class="btn btn-primary ml-auto" on:click={handleNextClick}>다음</button>
             {/if}
 
-            {#if step === 3}
+            {#if step === Step.DETAILS}
                 <button class="btn btn-outline" on:click={handlePreviousClick}>이전</button>
                 <button class="btn btn-primary ml-auto" on:click={handleNextClick}>다음</button>
             {/if}
 
-            {#if step === 4}
+            {#if step === Step.PREVIEW}
                 <button class="btn btn-outline" on:click={handlePreviousClick}>이전</button>
                 <button class="btn btn-primary ml-auto">공유하기</button>
             {/if}

@@ -1,7 +1,7 @@
 <script>
     import { goto } from '$app/navigation';
     import HeartIcon from "$lib/components/icon/HeartIcon.svelte";
-    import MessgeIcon from "$lib/components/icon/MessgeIcon.svelte";
+    import MessgeIcon from "$lib/components/icon/MessageIcon.svelte";
 
     export let user;
     export let imageUrl;

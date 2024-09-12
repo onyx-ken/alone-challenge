@@ -103,7 +103,7 @@
 
 <Card title="내 프로필">
     <!-- Profile Image -->
-    <div class="flex flex-col items-center space-y-4 mt-4">
+    <div class="flex flex-col space-y-4 p-4 items-center mt-4">
         <div class="avatar w-32 h-32">
             <img src={profileUrl} alt="Profile picture" class="rounded-full object-cover"/>
         </div>

@@ -1,7 +1,7 @@
 <script>
     import PostDetailModal from '$lib/components/main/ui/PostDetailModal.svelte';
     import HeartIcon from "$lib/components/icon/HeartIcon.svelte";
-    import MessgeIcon from "$lib/components/icon/MessgeIcon.svelte";
+    import MessgeIcon from "$lib/components/icon/MessageIcon.svelte";
     import DirectionIcon from "$lib/components/icon/DirectionIcon.svelte";
     import XIcon from "$lib/components/icon/XIcon.svelte";
 

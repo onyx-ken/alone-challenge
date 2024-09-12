@@ -1,6 +1,6 @@
 <script>
     import HeartIcon from "$lib/components/icon/HeartIcon.svelte";
-    import MessgeIcon from "$lib/components/icon/MessgeIcon.svelte";
+    import MessageIcon from "$lib/components/icon/MessageIcon.svelte";
 
     export let currentPostIndex = 0;  // 현재 포스트의 인덱스
     let commentInput = null;  // input 요소에 접근하기 위한 ref
@@ -172,7 +172,7 @@
                          </button>
                     {/if}
                     <button class="btn btn-outline btn-sm" on:click={handleCommentIconClick}>
-                        <MessgeIcon />
+                        <MessageIcon />
                     </button>
                 </div>
                 <div>
