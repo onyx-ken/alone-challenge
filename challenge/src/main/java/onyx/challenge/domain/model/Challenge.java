@@ -1,6 +1,9 @@
-package onyx.challenge.domain;
+package onyx.challenge.domain.model;
 
 import lombok.Getter;
+import onyx.challenge.domain.vo.ChallengeResult;
+import onyx.challenge.domain.vo.GoalContent;
+import onyx.challenge.domain.vo.Period;
 
 import java.util.List;
 

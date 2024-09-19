@@ -1,4 +1,4 @@
-package onyx.challenge.domain;
+package onyx.challenge.domain.vo;
 
 public enum DurationCategory {
     SHORT_TERM,   // 단기: 7일 미만

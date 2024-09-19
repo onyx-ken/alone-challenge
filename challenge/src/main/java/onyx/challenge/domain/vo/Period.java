@@ -1,4 +1,4 @@
-package onyx.challenge.domain;
+package onyx.challenge.domain.vo;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;

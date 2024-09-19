@@ -1,10 +1,10 @@
-package onyx.challenge.entity;
+package onyx.challenge.framework.adapter.jpaadapter.entity;
 
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import onyx.challenge.domain.Period;
+import onyx.challenge.domain.vo.Period;
 
 import java.time.LocalDate;
 

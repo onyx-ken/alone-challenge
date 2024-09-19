@@ -1,7 +1,7 @@
 package onyx.challenge;
 
-import onyx.challenge.domain.DurationCategory;
-import onyx.challenge.domain.Period;
+import onyx.challenge.domain.vo.DurationCategory;
+import onyx.challenge.domain.vo.Period;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

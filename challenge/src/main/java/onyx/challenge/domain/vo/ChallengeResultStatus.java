@@ -1,4 +1,4 @@
-package onyx.challenge.domain;
+package onyx.challenge.domain.vo;
 
 public enum ChallengeResultStatus {
     ON_GOING, // 기간 내 진행 중

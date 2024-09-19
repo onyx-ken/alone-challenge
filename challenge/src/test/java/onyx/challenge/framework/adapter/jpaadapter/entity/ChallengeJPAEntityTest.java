@@ -1,6 +1,7 @@
-package onyx.challenge.entity;
+package onyx.challenge.framework.adapter.jpaadapter.entity;
 
-import onyx.challenge.domain.*;
+import onyx.challenge.domain.model.Challenge;
+import onyx.challenge.domain.vo.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +11,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ChallengeConversionTest {
+class ChallengeJPAEntityTest {
 
     @Test
     @DisplayName("도메인 모델에서 JPA 엔티티로 변환한 후 다시 도메인 모델로 변환하면 동일한 데이터를 유지한다")
@@ -80,7 +81,7 @@ public class ChallengeConversionTest {
                         LocalDate.now().minusDays(1),
                         new AdditionalInfoEmbeddable("추가 정보 코멘트")
                 ),
-                Arrays.asList("additional_image1.png")
+                List.of("additional_image1.png")
         );
 
         // When

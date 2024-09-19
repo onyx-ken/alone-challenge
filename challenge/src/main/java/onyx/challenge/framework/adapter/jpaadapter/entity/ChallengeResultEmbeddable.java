@@ -1,4 +1,4 @@
-package onyx.challenge.entity;
+package onyx.challenge.framework.adapter.jpaadapter.entity;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
@@ -7,9 +7,9 @@ import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import onyx.challenge.domain.AdditionalInfo;
-import onyx.challenge.domain.ChallengeResult;
-import onyx.challenge.domain.ChallengeResultStatus;
+import onyx.challenge.domain.vo.AdditionalInfo;
+import onyx.challenge.domain.vo.ChallengeResult;
+import onyx.challenge.domain.vo.ChallengeResultStatus;
 
 import java.time.LocalDate;
 import java.util.List;

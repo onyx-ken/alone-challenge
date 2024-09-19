@@ -1,8 +1,8 @@
 package onyx.challenge;
 
-import onyx.challenge.domain.AdditionalInfo;
-import onyx.challenge.domain.ChallengeResult;
-import onyx.challenge.domain.ChallengeResultStatus;
+import onyx.challenge.domain.vo.AdditionalInfo;
+import onyx.challenge.domain.vo.ChallengeResult;
+import onyx.challenge.domain.vo.ChallengeResultStatus;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

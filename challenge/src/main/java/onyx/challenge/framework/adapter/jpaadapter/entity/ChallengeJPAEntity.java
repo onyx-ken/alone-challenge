@@ -1,12 +1,12 @@
-package onyx.challenge.entity;
+package onyx.challenge.framework.adapter.jpaadapter.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import onyx.challenge.domain.AdditionalInfo;
-import onyx.challenge.domain.Challenge;
-import onyx.challenge.domain.ChallengeResult;
+import onyx.challenge.domain.vo.AdditionalInfo;
+import onyx.challenge.domain.model.Challenge;
+import onyx.challenge.domain.vo.ChallengeResult;
 
 import java.util.List;
 

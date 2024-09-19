@@ -1,4 +1,4 @@
-package onyx.challenge.entity;
+package onyx.challenge.framework.adapter.jpaadapter.entity;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
@@ -6,8 +6,8 @@ import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import onyx.challenge.domain.GoalContent;
-import onyx.challenge.domain.GoalType;
+import onyx.challenge.domain.vo.GoalContent;
+import onyx.challenge.domain.vo.GoalType;
 
 @Embeddable
 @Getter
