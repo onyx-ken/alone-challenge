@@ -57,7 +57,7 @@ class ChallengeTest {
         Assertions.assertThatThrownBy(() -> Challenge.create(challengeId, userId, nickName, period, goalContent,
                         attachedImagePaths, challengeCertificateImagePath))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("챌린지 ID는 필수입니다.");
+                .hasMessageContaining("회원 ID는 필수입니다.");
     }
 
     @Test
