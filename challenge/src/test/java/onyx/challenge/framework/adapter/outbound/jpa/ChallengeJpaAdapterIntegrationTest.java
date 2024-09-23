@@ -1,6 +1,6 @@
 package onyx.challenge.framework.adapter.outbound.jpa;
 
-import onyx.challenge.application.port.outbound.CreateChallengeOutputPort;
+import onyx.challenge.application.port.outbound.ChallengeRepository;
 import onyx.challenge.domain.model.Challenge;
 import onyx.challenge.domain.vo.GoalContent;
 import onyx.challenge.domain.vo.GoalType;
@@ -24,10 +24,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ChallengeJpaAdapterIntegrationTest {
 
     @Autowired
-    private CreateChallengeOutputPort createChallengeOutputPort;
+    private ChallengeRepository challengeRepository;
 
     @Autowired
-    private ChallengeRepository challengeRepository;
+    private ChallengeJpaRepository challengeJPARepository;
 
     @Test
     public void givenChallenge_whenSave_thenChallengeIsPersistedInDatabase() {
@@ -43,14 +43,14 @@ class ChallengeJpaAdapterIntegrationTest {
         );
 
         // When
-        Challenge savedChallenge = createChallengeOutputPort.save(challenge);
+        Challenge savedChallenge = challengeRepository.save(challenge);
 
         // Then
         assertThat(savedChallenge).isNotNull();
         assertThat(savedChallenge.getNickName()).isEqualTo("JohnDoe");
 
         // Verify that the challenge is persisted in the database
-        ChallengeJPAEntity foundEntity = challengeRepository.findById(savedChallenge.getChallengeId()).orElse(null);
+        ChallengeJPAEntity foundEntity = challengeJPARepository.findById(savedChallenge.getChallengeId()).orElse(null);
         assertThat(foundEntity).isNotNull();
         assertThat(foundEntity.getUserId()).isEqualTo(1L);
         assertThat(foundEntity.getNickName()).isEqualTo("JohnDoe");

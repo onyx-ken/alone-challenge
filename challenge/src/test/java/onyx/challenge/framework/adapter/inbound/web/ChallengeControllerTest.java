@@ -1,6 +1,7 @@
 package onyx.challenge.framework.adapter.inbound.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import onyx.challenge.application.port.inbound.CreateChallengeUseCase;
 import onyx.challenge.application.service.CreateChallengeService;
 import onyx.challenge.application.dto.ChallengeInputDTO;
 import onyx.challenge.application.dto.ChallengeOutputDTO;
@@ -26,7 +27,7 @@ public class ChallengeControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CreateChallengeService createChallengeService;
+    private CreateChallengeUseCase createChallengeUseCase;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -44,7 +45,7 @@ public class ChallengeControllerTest {
         request.setGoalType("POSITIVE");
 
         ChallengeOutputDTO outputDTO = new ChallengeOutputDTO(1L);
-        Mockito.when(createChallengeService.createChallenge(any(ChallengeInputDTO.class))).thenReturn(outputDTO);
+        Mockito.when(createChallengeUseCase.createChallenge(any(ChallengeInputDTO.class))).thenReturn(outputDTO);
 
         // When & Then
         mockMvc.perform(post("/challenges")

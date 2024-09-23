@@ -2,7 +2,7 @@ package onyx.challenge.application.service;
 
 import lombok.RequiredArgsConstructor;
 import onyx.challenge.application.port.inbound.CreateChallengeUseCase;
-import onyx.challenge.application.port.outbound.CreateChallengeOutputPort;
+import onyx.challenge.application.port.outbound.ChallengeRepository;
 import onyx.challenge.application.dto.ChallengeInputDTO;
 import onyx.challenge.application.dto.ChallengeOutputDTO;
 import onyx.challenge.domain.model.Challenge;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CreateChallengeService implements CreateChallengeUseCase {
 
-    private final CreateChallengeOutputPort createChallengeOutputPort;
+    private final ChallengeRepository challengeRepository;
 
     @Override
     public ChallengeOutputDTO createChallenge(ChallengeInputDTO challengeInputDTO) {
@@ -25,7 +25,7 @@ public class CreateChallengeService implements CreateChallengeUseCase {
                 new Period(challengeInputDTO.getStartDate(), challengeInputDTO.getEndDate()),
                 GoalContent.create(challengeInputDTO.getMainContent(), challengeInputDTO.getAdditionalContent(), GoalType.valueOf(challengeInputDTO.getGoalType())),
                 challengeInputDTO.getAttachedImagePaths(), challengeInputDTO.getChallengeCertificateImagePath());
-        return ChallengeOutputDTO.from(createChallengeOutputPort.save(challenge));
+        return ChallengeOutputDTO.from(challengeRepository.save(challenge));
     }
 
 }

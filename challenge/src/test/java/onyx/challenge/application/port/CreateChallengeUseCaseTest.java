@@ -2,8 +2,7 @@ package onyx.challenge.application.port;
 
 import onyx.challenge.application.dto.ChallengeInputDTO;
 import onyx.challenge.application.dto.ChallengeOutputDTO;
-import onyx.challenge.application.port.inbound.CreateChallengeUseCase;
-import onyx.challenge.application.port.outbound.CreateChallengeOutputPort;
+import onyx.challenge.application.port.outbound.ChallengeRepository;
 import onyx.challenge.application.service.CreateChallengeService;
 import onyx.challenge.domain.model.Challenge;
 import onyx.challenge.domain.vo.GoalContent;
@@ -27,7 +26,7 @@ import static org.mockito.BDDMockito.given;
 class CreateChallengeUseCaseTest {
 
     @Mock
-    private CreateChallengeOutputPort createChallengeOutputPort;
+    private ChallengeRepository challengeRepository;
 
     @InjectMocks
     private CreateChallengeService createChallengeService;
@@ -62,7 +61,7 @@ class CreateChallengeUseCaseTest {
                 challengeInputDTO.getChallengeCertificateImagePath()
         );
 
-        given(createChallengeOutputPort.save(any(Challenge.class))).willReturn(challenge);
+        given(challengeRepository.save(any(Challenge.class))).willReturn(challenge);
 
         // When
         ChallengeOutputDTO result = createChallengeService.createChallenge(challengeInputDTO);
