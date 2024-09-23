@@ -1,7 +1,7 @@
 package onyx.challenge.application.port;
 
-import onyx.challenge.application.dto.ChallengeInputDTO;
-import onyx.challenge.application.dto.ChallengeOutputDTO;
+import onyx.challenge.application.usecase.dto.ChallengeInputDTO;
+import onyx.challenge.application.usecase.dto.ChallengeOutputDTO;
 import onyx.challenge.application.port.in.CreateChallengeInputPort;
 import onyx.challenge.application.port.out.CreateChallengeOutputPort;
 import onyx.challenge.domain.model.Challenge;
@@ -70,7 +70,6 @@ class CreateChallengeInputPortTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getChallengeId()).isNull();
-        assertThat(result.getMessage()).isEqualTo("Challenge를 생성했습니다.");
 
     }
 

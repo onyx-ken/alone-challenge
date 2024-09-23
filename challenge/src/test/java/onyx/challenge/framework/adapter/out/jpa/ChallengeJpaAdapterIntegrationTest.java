@@ -1,11 +1,11 @@
-package onyx.challenge.framework.adapter.jpaadapter;
+package onyx.challenge.framework.adapter.out.jpa;
 
 import onyx.challenge.application.port.out.CreateChallengeOutputPort;
 import onyx.challenge.domain.model.Challenge;
 import onyx.challenge.domain.vo.GoalContent;
 import onyx.challenge.domain.vo.GoalType;
 import onyx.challenge.domain.vo.Period;
-import onyx.challenge.framework.adapter.jpaadapter.entity.ChallengeJPAEntity;
+import onyx.challenge.framework.adapter.out.jpa.entity.ChallengeJPAEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,8 +1,8 @@
 package onyx.challenge.application.port.in;
 
 import lombok.RequiredArgsConstructor;
-import onyx.challenge.application.dto.ChallengeInputDTO;
-import onyx.challenge.application.dto.ChallengeOutputDTO;
+import onyx.challenge.application.usecase.dto.ChallengeInputDTO;
+import onyx.challenge.application.usecase.dto.ChallengeOutputDTO;
 import onyx.challenge.application.port.out.CreateChallengeOutputPort;
 import onyx.challenge.application.usecase.CreateChallengeUseCase;
 import onyx.challenge.domain.model.Challenge;

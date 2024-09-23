@@ -1,4 +1,4 @@
-package onyx.challenge.application.dto;
+package onyx.challenge.application.usecase.dto;
 
 import lombok.Builder;
 import lombok.Data;

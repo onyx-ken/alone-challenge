@@ -1,4 +1,4 @@
-package onyx.challenge.framework.adapter.jpaadapter.entity;
+package onyx.challenge.framework.adapter.out.jpa.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
