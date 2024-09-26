@@ -32,6 +32,7 @@ class ChallengeJPAEntityTest {
                 LocalDate.now().minusDays(1),
                 additionalInfo
         );
+        boolean isActive = false;
 
         Challenge originalChallenge = Challenge.from(
                 challengeId,
@@ -41,7 +42,8 @@ class ChallengeJPAEntityTest {
                 goalContent,
                 attachedImagePaths,
                 challengeCertificateImagePath,
-                challengeResult
+                challengeResult,
+                isActive
         );
 
         // When
@@ -62,6 +64,7 @@ class ChallengeJPAEntityTest {
         assertThat(convertedChallenge.getResult().getInfo().getComments()).isEqualTo(originalChallenge.getResult().getInfo().getComments());
         assertThat(convertedChallenge.getResult().getInfo().getAttachedImagePaths())
                 .isEqualTo(originalChallenge.getResult().getInfo().getAttachedImagePaths());
+        assertThat(convertedChallenge.isActive()).isEqualTo(originalChallenge.isActive());
     }
 
     @Test
@@ -104,6 +107,8 @@ class ChallengeJPAEntityTest {
         assertThat(challenge.getResult().getInfo().getComments()).isEqualTo(challengeEntity.getResult().getInfo().getComments());
         assertThat(challenge.getResult().getInfo().getAttachedImagePaths())
                 .isEqualTo(challengeEntity.getAdditionalInfoAttachedImagePaths());
+        assertThat(challenge.isActive()).isEqualTo(challengeEntity.isActive());
+
     }
 
     @Test
@@ -122,7 +127,8 @@ class ChallengeJPAEntityTest {
                         ChallengeResultStatus.SUCCEEDED,
                         LocalDate.now().minusDays(1),
                         AdditionalInfo.from(List.of(), "추가 정보 코멘트")
-                )
+                ),
+                true
         );
 
         // When

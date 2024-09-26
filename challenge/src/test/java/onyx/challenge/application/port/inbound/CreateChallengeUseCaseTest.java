@@ -1,4 +1,4 @@
-package onyx.challenge.application.port;
+package onyx.challenge.application.port.inbound;
 
 import onyx.challenge.application.dto.ChallengeInputDTO;
 import onyx.challenge.application.dto.ChallengeOutputDTO;

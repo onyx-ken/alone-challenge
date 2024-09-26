@@ -1,6 +1,5 @@
-package onyx.challenge.domain;
+package onyx.challenge.domain.model;
 
-import onyx.challenge.domain.model.*;
 import onyx.challenge.domain.vo.*;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +38,7 @@ class ChallengeTest {
         Assertions.assertThat(challenge.getChallengeCertificateImagePath()).isEqualTo(challengeCertificateImagePath);
         Assertions.assertThat(challenge.getResult()).isNotNull();
         Assertions.assertThat(challenge.getResult().getStatus()).isEqualTo(ChallengeResultStatus.ON_GOING);
+        Assertions.assertThat(challenge.isActive()).isTrue();
     }
 
     @Test
@@ -82,10 +82,11 @@ class ChallengeTest {
         List<String> newAttachedImagePaths = Arrays.asList("new_image1.png");
         String newChallengeCertificateImagePath = "new_certificate.png";
         ChallengeResult newResult = ChallengeResult.updateStatus(ChallengeResultStatus.SUCCEEDED, null, null);
+        boolean newIsActive = false;
 
         // When
         Challenge updatedChallenge = challenge.update(newNickName, newPeriod, newGoalContent,
-                newAttachedImagePaths, newChallengeCertificateImagePath, newResult);
+                newAttachedImagePaths, newChallengeCertificateImagePath, newResult, newIsActive);
 
         // Then
         Assertions.assertThat(updatedChallenge).isNotSameAs(challenge);
@@ -95,6 +96,7 @@ class ChallengeTest {
         Assertions.assertThat(updatedChallenge.getAttachedImagePaths()).containsExactlyElementsOf(newAttachedImagePaths);
         Assertions.assertThat(updatedChallenge.getChallengeCertificateImagePath()).isEqualTo(newChallengeCertificateImagePath);
         Assertions.assertThat(updatedChallenge.getResult()).isEqualTo(newResult);
+        Assertions.assertThat(updatedChallenge.isActive()).isFalse();
 
         // 원본 객체는 변경되지 않음
         Assertions.assertThat(challenge.getNickName()).isEqualTo(nickName);
@@ -103,6 +105,7 @@ class ChallengeTest {
         Assertions.assertThat(challenge.getAttachedImagePaths()).containsExactlyElementsOf(attachedImagePaths);
         Assertions.assertThat(challenge.getChallengeCertificateImagePath()).isEqualTo(challengeCertificateImagePath);
         Assertions.assertThat(challenge.getResult()).isNotEqualTo(newResult);
+        Assertions.assertThat(challenge.isActive()).isNotEqualTo(newResult);
     }
 
     @Test
@@ -122,7 +125,7 @@ class ChallengeTest {
                 attachedImagePaths, challengeCertificateImagePath);
 
         // When
-        Challenge updatedChallenge = challenge.update(null, null, null, null, null, null);
+        Challenge updatedChallenge = challenge.update(null, null, null, null, null, null, false);
 
         // Then
         Assertions.assertThat(updatedChallenge).isNotSameAs(challenge);

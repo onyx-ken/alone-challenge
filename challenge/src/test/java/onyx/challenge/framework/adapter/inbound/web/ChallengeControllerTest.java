@@ -2,7 +2,6 @@ package onyx.challenge.framework.adapter.inbound.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import onyx.challenge.application.port.inbound.CreateChallengeUseCase;
-import onyx.challenge.application.service.CreateChallengeService;
 import onyx.challenge.application.dto.ChallengeInputDTO;
 import onyx.challenge.application.dto.ChallengeOutputDTO;
 import onyx.challenge.framework.adapter.inbound.web.api.ApiStatus;

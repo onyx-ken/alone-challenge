@@ -18,22 +18,24 @@ public class Challenge {
     private final List<String> attachedImagePaths;
     private final String challengeCertificateImagePath;
     private final ChallengeResult result;
+    private final boolean isActive;
 
     public static Challenge from(Long challengeId, Long userId, String nickName, Period period,
                                  GoalContent goalContent, List<String> attachedImagePaths,
-                                 String challengeCertificateImagePath, ChallengeResult result) {
-        return new Challenge(challengeId, userId, nickName, period, goalContent, attachedImagePaths, challengeCertificateImagePath, result);
+                                 String challengeCertificateImagePath, ChallengeResult result, boolean isActive) {
+        return new Challenge(challengeId, userId, nickName, period, goalContent, attachedImagePaths, challengeCertificateImagePath, result, isActive);
     }
 
     public static Challenge create(Long challengeId, Long userId, String nickName, Period period,
                                    GoalContent goalContent, List<String> attachedImagePaths,
                                    String challengeCertificateImagePath) {
         return new Challenge(challengeId, userId, nickName, period, goalContent, attachedImagePaths,
-                challengeCertificateImagePath, ChallengeResult.createDefault());
+                challengeCertificateImagePath, ChallengeResult.createDefault(), true);
     }
 
     public Challenge update(String nickName, Period period, GoalContent goalContent,
-                            List<String> attachedImagePaths, String challengeCertificateImagePath, ChallengeResult result) {
+                            List<String> attachedImagePaths, String challengeCertificateImagePath,
+                            ChallengeResult result, boolean isActive) {
         return new Challenge(
                 this.challengeId,
                 this.userId,
@@ -42,12 +44,14 @@ public class Challenge {
                 goalContent != null ? goalContent : this.goalContent,
                 attachedImagePaths != null ? attachedImagePaths : this.attachedImagePaths,
                 challengeCertificateImagePath != null ? challengeCertificateImagePath : this.challengeCertificateImagePath,
-                result != null ? result : this.result
+                result != null ? result : this.result,
+                this.isActive == isActive
+
         );
     }
 
     private Challenge(Long challengeId, Long userId, String nickName, Period period, GoalContent goalContent,
-                      List<String> attachedImagePaths, String challengeCertificateImagePath, ChallengeResult result) {
+                      List<String> attachedImagePaths, String challengeCertificateImagePath, ChallengeResult result, boolean isActive) {
         validateRequiredFields(userId, nickName, period, goalContent);
         this.challengeId = challengeId;
         this.userId = userId;
@@ -58,6 +62,7 @@ public class Challenge {
         this.attachedImagePaths = (attachedImagePaths != null) ? List.copyOf(attachedImagePaths) : List.of();
         this.challengeCertificateImagePath = challengeCertificateImagePath;
         this.result = result != null ? result : ChallengeResult.createDefault();
+        this.isActive = isActive;
     }
 
     private void validateRequiredFields(Long userId, String nickName,

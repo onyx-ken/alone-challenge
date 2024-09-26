@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import onyx.challenge.domain.vo.AdditionalInfo;
 import onyx.challenge.domain.model.Challenge;
 import onyx.challenge.domain.vo.ChallengeResult;
+import org.hibernate.type.YesNoConverter;
 
 import java.util.List;
 
@@ -47,6 +48,9 @@ public class ChallengeJPAEntity {
     @Column(name = "image_path")
     private List<String> additionalInfoAttachedImagePaths;
 
+    @Convert(converter = YesNoConverter.class)
+    private boolean isActive = true;
+
     // 도메인 모델로부터 변환
     public static ChallengeJPAEntity fromDomain(Challenge challenge) {
         ChallengeJPAEntity entity = new ChallengeJPAEntity();
@@ -61,6 +65,7 @@ public class ChallengeJPAEntity {
         entity.additionalInfoAttachedImagePaths = challenge.getResult().getInfo().getAttachedImagePaths() != null
                 ? List.copyOf(challenge.getResult().getInfo().getAttachedImagePaths())
                 : List.of();
+        entity.isActive = challenge.isActive();
         return entity;
     }
 
@@ -81,7 +86,8 @@ public class ChallengeJPAEntity {
                 this.goalContent.toDomain(),
                 this.attachedImagePaths,
                 this.challengeCertificateImagePath,
-                result
+                result,
+                this.isActive
         );
     }
 
@@ -106,6 +112,7 @@ public class ChallengeJPAEntity {
         entity.challengeCertificateImagePath = challengeCertificateImagePath;
         entity.result = result;
         entity.additionalInfoAttachedImagePaths = additionalInfoAttachedImagePaths;
+        entity.isActive = true;
         return entity;
     }
 }
