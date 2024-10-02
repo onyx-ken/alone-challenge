@@ -1,10 +1,11 @@
-package onyx.challenge.framework.adapter.outbound.jpa;
+package onyx.challenge.framework.adapter.outbound;
 
 import onyx.challenge.application.port.outbound.ChallengeRepository;
 import onyx.challenge.domain.model.Challenge;
 import onyx.challenge.domain.vo.GoalContent;
 import onyx.challenge.domain.vo.GoalType;
 import onyx.challenge.domain.vo.Period;
+import onyx.challenge.framework.adapter.outbound.jpa.ChallengeJpaRepository;
 import onyx.challenge.framework.adapter.outbound.jpa.entity.ChallengeJPAEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,10 +39,8 @@ class ChallengeJpaAdapterIntegrationTest {
                 "JohnDoe",
                 new Period(LocalDate.of(2024,9,19), LocalDate.of(2024, 9 ,21)),
                 GoalContent.create("Run 5K", "Do It!", GoalType.POSITIVE),
-                List.of("path/to/image1.jpg", "path/to/image2.jpg"),
-                "path/to/certificate.jpg"
+                Arrays.asList(5L, 6L)
         );
-
         // When
         Challenge savedChallenge = challengeRepository.save(challenge);
 

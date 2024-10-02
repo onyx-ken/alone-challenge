@@ -43,7 +43,7 @@ public class ChallengeControllerTest {
         request.setAdditionalContent("Additional Info");
         request.setGoalType("POSITIVE");
 
-        ChallengeOutputDTO outputDTO = new ChallengeOutputDTO(1L);
+        ChallengeOutputDTO outputDTO = new ChallengeOutputDTO(1L, 0);
         Mockito.when(createChallengeUseCase.createChallenge(any(ChallengeInputDTO.class))).thenReturn(outputDTO);
 
         // When & Then

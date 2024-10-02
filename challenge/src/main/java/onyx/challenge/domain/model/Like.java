@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+// todo 추후 댓글 좋아요 기능이 생기면 별도의 인터페이스로 만들어서, 분리 관리 할 것!
 @Getter
 public class Like {
 

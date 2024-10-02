@@ -9,9 +9,10 @@ import onyx.challenge.domain.model.Challenge;
 public class ChallengeOutputDTO {
 
     private Long challengeId;
+    private int likeCount;
 
-    public static ChallengeOutputDTO from(Challenge challenge) {
-        return new ChallengeOutputDTO(challenge.getChallengeId());
+    public static ChallengeOutputDTO from(Challenge challenge, int likeCount) {
+        return new ChallengeOutputDTO(challenge.getChallengeId(), likeCount);
     }
 
 }

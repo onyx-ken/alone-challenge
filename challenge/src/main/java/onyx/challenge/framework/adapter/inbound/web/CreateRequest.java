@@ -4,8 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import onyx.challenge.application.dto.ChallengeInputDTO;
+import onyx.challenge.application.dto.FileInputData;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -31,9 +34,7 @@ public class CreateRequest {
     @NotBlank(message = "goalType은 필수입니다.")
     private String goalType; // POSITIVE 또는 NEGATIVE
 
-    private List<String> attachedImagePaths;
-
-    private String challengeCertificateImagePath;
+    private List<MultipartFile> attachedImages = new ArrayList<>();
 
     public ChallengeInputDTO toDTO() {
         return ChallengeInputDTO.builder()
@@ -44,8 +45,7 @@ public class CreateRequest {
                 .mainContent(this.mainContent)
                 .additionalContent(this.additionalContent)
                 .goalType(this.goalType)
-                .attachedImagePaths(this.attachedImagePaths)
-                .challengeCertificateImagePath(this.challengeCertificateImagePath)
+                .attachedImages(attachedImages.stream().map(FileInputData::convert).toList())
                 .build();
     }
 }

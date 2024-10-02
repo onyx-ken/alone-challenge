@@ -15,26 +15,20 @@ public class Challenge {
     private final String nickName;
     private final Period period;
     private final GoalContent goalContent;
-    private final List<String> attachedImagePaths;
-    private final String challengeCertificateImagePath;
+    private final List<Long> attachedImageIds;
     private final ChallengeResult result;
     private final boolean isActive;
 
     public static Challenge from(Long challengeId, Long userId, String nickName, Period period,
-                                 GoalContent goalContent, List<String> attachedImagePaths,
-                                 String challengeCertificateImagePath, ChallengeResult result, boolean isActive) {
-        return new Challenge(challengeId, userId, nickName, period, goalContent, attachedImagePaths, challengeCertificateImagePath, result, isActive);
+                                 GoalContent goalContent, List<Long> attachedImageIds, ChallengeResult result, boolean isActive) {
+        return new Challenge(challengeId, userId, nickName, period, goalContent, attachedImageIds, result, isActive);
     }
 
-    public static Challenge create(Long challengeId, Long userId, String nickName, Period period,
-                                   GoalContent goalContent, List<String> attachedImagePaths,
-                                   String challengeCertificateImagePath) {
-        return new Challenge(challengeId, userId, nickName, period, goalContent, attachedImagePaths,
-                challengeCertificateImagePath, ChallengeResult.createDefault(), true);
+    public static Challenge create(Long challengeId, Long userId, String nickName, Period period, GoalContent goalContent, List<Long> attachedImageIds) {
+        return new Challenge(challengeId, userId, nickName, period, goalContent, attachedImageIds, ChallengeResult.createDefault(), true);
     }
 
-    public Challenge update(String nickName, Period period, GoalContent goalContent,
-                            List<String> attachedImagePaths, String challengeCertificateImagePath,
+    public Challenge update(String nickName, Period period, GoalContent goalContent, List<Long> attachedImageIds,
                             ChallengeResult result, boolean isActive) {
         return new Challenge(
                 this.challengeId,
@@ -42,25 +36,22 @@ public class Challenge {
                 nickName != null ? nickName : this.nickName,
                 period != null ? period : this.period,
                 goalContent != null ? goalContent : this.goalContent,
-                attachedImagePaths != null ? attachedImagePaths : this.attachedImagePaths,
-                challengeCertificateImagePath != null ? challengeCertificateImagePath : this.challengeCertificateImagePath,
+                attachedImageIds != null ? attachedImageIds : this.attachedImageIds,
                 result != null ? result : this.result,
                 this.isActive == isActive
 
         );
     }
 
-    private Challenge(Long challengeId, Long userId, String nickName, Period period, GoalContent goalContent,
-                      List<String> attachedImagePaths, String challengeCertificateImagePath, ChallengeResult result, boolean isActive) {
+    private Challenge(Long challengeId, Long userId, String nickName, Period period,
+                      GoalContent goalContent, List<Long> attachedImageIds, ChallengeResult result, boolean isActive) {
         validateRequiredFields(userId, nickName, period, goalContent);
         this.challengeId = challengeId;
         this.userId = userId;
         this.nickName = nickName;
         this.period = period;
         this.goalContent = goalContent;
-        // 방어적 복사를 통해 리스트의 불변성 유지
-        this.attachedImagePaths = (attachedImagePaths != null) ? List.copyOf(attachedImagePaths) : List.of();
-        this.challengeCertificateImagePath = challengeCertificateImagePath;
+        this.attachedImageIds = attachedImageIds != null ? List.copyOf(attachedImageIds) : List.of();
         this.result = result != null ? result : ChallengeResult.createDefault();
         this.isActive = isActive;
     }

@@ -22,8 +22,7 @@ class ChallengeJPAEntityTest {
         String nickName = "챌린저";
         Period period = new Period(LocalDate.now(), LocalDate.now().plusDays(7));
         GoalContent goalContent = GoalContent.from("목표 내용", "추가 내용", GoalType.POSITIVE);
-        List<String> attachedImagePaths = Arrays.asList("image1.png", "image2.png");
-        String challengeCertificateImagePath = "certificate.png";
+        List<Long> attachedImageIds = Arrays.asList(5L,6L);
         List<String> additionalInfoAttachedImagePaths = List.of("additional_image1.png");
         String comments = "추가 정보 코멘트";
         AdditionalInfo additionalInfo = AdditionalInfo.from(additionalInfoAttachedImagePaths, comments);
@@ -40,8 +39,7 @@ class ChallengeJPAEntityTest {
                 nickName,
                 period,
                 goalContent,
-                attachedImagePaths,
-                challengeCertificateImagePath,
+                attachedImageIds,
                 challengeResult,
                 isActive
         );
@@ -57,8 +55,6 @@ class ChallengeJPAEntityTest {
         assertThat(convertedChallenge.getNickName()).isEqualTo(originalChallenge.getNickName());
         assertThat(convertedChallenge.getPeriod()).isEqualTo(originalChallenge.getPeriod());
         assertThat(convertedChallenge.getGoalContent()).isEqualTo(originalChallenge.getGoalContent());
-        assertThat(convertedChallenge.getAttachedImagePaths()).isEqualTo(originalChallenge.getAttachedImagePaths());
-        assertThat(convertedChallenge.getChallengeCertificateImagePath()).isEqualTo(originalChallenge.getChallengeCertificateImagePath());
         assertThat(convertedChallenge.getResult().getStatus()).isEqualTo(originalChallenge.getResult().getStatus());
         assertThat(convertedChallenge.getResult().getConfirmedDate()).isEqualTo(originalChallenge.getResult().getConfirmedDate());
         assertThat(convertedChallenge.getResult().getInfo().getComments()).isEqualTo(originalChallenge.getResult().getInfo().getComments());
@@ -77,8 +73,7 @@ class ChallengeJPAEntityTest {
                 "챌린저",
                 new PeriodEmbeddable(LocalDate.now(), LocalDate.now().plusDays(7)),
                 new GoalContentEmbeddable("목표 내용", "추가 내용", GoalType.POSITIVE),
-                Arrays.asList("image1.png", "image2.png"),
-                "certificate.png",
+                Arrays.asList(5L,6L),
                 new ChallengeResultEmbeddable(
                         ChallengeResultStatus.SUCCEEDED,
                         LocalDate.now().minusDays(1),
@@ -100,8 +95,6 @@ class ChallengeJPAEntityTest {
         assertThat(challenge.getGoalContent().getMainContent()).isEqualTo(challengeEntity.getGoalContent().getMainContent());
         assertThat(challenge.getGoalContent().getAdditionalContent()).isEqualTo(challengeEntity.getGoalContent().getAdditionalContent());
         assertThat(challenge.getGoalContent().getType()).isEqualTo(challengeEntity.getGoalContent().getType());
-        assertThat(challenge.getAttachedImagePaths()).isEqualTo(challengeEntity.getAttachedImagePaths());
-        assertThat(challenge.getChallengeCertificateImagePath()).isEqualTo(challengeEntity.getChallengeCertificateImagePath());
         assertThat(challenge.getResult().getStatus()).isEqualTo(challengeEntity.getResult().getStatus());
         assertThat(challenge.getResult().getConfirmedDate()).isEqualTo(challengeEntity.getResult().getConfirmedDate());
         assertThat(challenge.getResult().getInfo().getComments()).isEqualTo(challengeEntity.getResult().getInfo().getComments());
@@ -121,8 +114,7 @@ class ChallengeJPAEntityTest {
                 "챌린저",
                 new Period(LocalDate.now(), LocalDate.now().plusDays(7)),
                 GoalContent.from("목표 내용", "추가 내용", GoalType.POSITIVE),
-                List.of(), // attachedImagePaths
-                "certificate.png",
+                Arrays.asList(5L,6L),
                 ChallengeResult.from(
                         ChallengeResultStatus.SUCCEEDED,
                         LocalDate.now().minusDays(1),
@@ -137,7 +129,6 @@ class ChallengeJPAEntityTest {
 
         // Then
         assertThat(convertedChallenge).isNotNull();
-        assertThat(convertedChallenge.getAttachedImagePaths()).isEmpty();
         assertThat(convertedChallenge.getResult().getInfo().getAttachedImagePaths()).isEmpty();
     }
 }

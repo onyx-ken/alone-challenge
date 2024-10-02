@@ -4,11 +4,12 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import onyx.challenge.domain.vo.AdditionalInfo;
 import onyx.challenge.domain.model.Challenge;
+import onyx.challenge.domain.vo.AdditionalInfo;
 import onyx.challenge.domain.vo.ChallengeResult;
 import org.hibernate.type.YesNoConverter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,10 +36,7 @@ public class ChallengeJPAEntity {
 
     @ElementCollection
     @CollectionTable(name = "challenge_attached_images", joinColumns = @JoinColumn(name = "challenge_id"))
-    @Column(name = "image_path")
-    private List<String> attachedImagePaths;
-
-    private String challengeCertificateImagePath;
+    private List<Long> attachedImages = new ArrayList<>();
 
     @Embedded
     private ChallengeResultEmbeddable result;
@@ -59,8 +57,7 @@ public class ChallengeJPAEntity {
         entity.nickName = challenge.getNickName();
         entity.period = PeriodEmbeddable.fromDomain(challenge.getPeriod());
         entity.goalContent = GoalContentEmbeddable.fromDomain(challenge.getGoalContent());
-        entity.attachedImagePaths = challenge.getAttachedImagePaths();
-        entity.challengeCertificateImagePath = challenge.getChallengeCertificateImagePath();
+        entity.attachedImages = challenge.getAttachedImageIds();
         entity.result = ChallengeResultEmbeddable.fromDomain(challenge.getResult());
         entity.additionalInfoAttachedImagePaths = challenge.getResult().getInfo().getAttachedImagePaths() != null
                 ? List.copyOf(challenge.getResult().getInfo().getAttachedImagePaths())
@@ -84,8 +81,7 @@ public class ChallengeJPAEntity {
                 this.nickName,
                 this.period.toDomain(),
                 this.goalContent.toDomain(),
-                this.attachedImagePaths,
-                this.challengeCertificateImagePath,
+                this.attachedImages,
                 result,
                 this.isActive
         );
@@ -97,8 +93,7 @@ public class ChallengeJPAEntity {
             String nickName,
             PeriodEmbeddable period,
             GoalContentEmbeddable goalContent,
-            List<String> attachedImagePaths,
-            String challengeCertificateImagePath,
+            List<Long> attachedImagePaths,
             ChallengeResultEmbeddable result,
             List<String> additionalInfoAttachedImagePaths
     ) {
@@ -108,8 +103,7 @@ public class ChallengeJPAEntity {
         entity.nickName = nickName;
         entity.period = period;
         entity.goalContent = goalContent;
-        entity.attachedImagePaths = attachedImagePaths;
-        entity.challengeCertificateImagePath = challengeCertificateImagePath;
+        entity.attachedImages = attachedImagePaths;
         entity.result = result;
         entity.additionalInfoAttachedImagePaths = additionalInfoAttachedImagePaths;
         entity.isActive = true;

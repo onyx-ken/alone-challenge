@@ -8,6 +8,9 @@ spring:
       prod: prod, common
       test: local
 
+storage:
+  path:
+    challenge: upload/files/challenge/
 ---
 
 spring:

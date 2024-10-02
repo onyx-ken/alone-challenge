@@ -6,6 +6,8 @@ import onyx.challenge.domain.model.Challenge;
 import onyx.challenge.framework.adapter.outbound.jpa.entity.ChallengeJPAEntity;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class ChallengeJpaAdapter implements ChallengeRepository {
@@ -15,6 +17,18 @@ public class ChallengeJpaAdapter implements ChallengeRepository {
     @Override
     public Challenge save(Challenge challenge) {
         return challengeJPARepository.save(ChallengeJPAEntity.fromDomain(challenge)).toDomain();
+    }
+
+    @Override
+    public Challenge load(Long id) {
+        return challengeJPARepository.findById(id).orElseThrow(()
+                -> new IllegalArgumentException("챌린지가 존재하지 않습니다.")).toDomain();
+    }
+
+    @Override
+    public List<Challenge> loadAll() {
+        return challengeJPARepository.findAllByActiveIsTrueOrderByPeriodStartDateDesc()
+                .stream().map(ChallengeJPAEntity::toDomain).toList();
     }
 
 }
