@@ -36,6 +36,7 @@ public class ChallengeJPAEntity {
 
     @ElementCollection
     @CollectionTable(name = "challenge_attached_images", joinColumns = @JoinColumn(name = "challenge_id"))
+    @Column(name = "attached_image_id")
     private List<Long> attachedImages = new ArrayList<>();
 
     @Embedded

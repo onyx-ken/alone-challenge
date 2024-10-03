@@ -1,7 +1,11 @@
+import nu.studer.gradle.jooq.JooqEdition
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.1'
     id 'io.spring.dependency-management' version '1.1.5'
+    id 'org.flywaydb.flyway' version '10.18.2'
+    id "nu.studer.jooq" version "9.0"
 }
 
 group = 'onyx'
@@ -35,10 +39,17 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-    compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'com.h2database:h2'
+    runtimeOnly group:'com.h2database', name: 'h2', version: '2.2.224'
     annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.flywaydb:flyway-core'
+
+    // JOOQ Dependencies
+    implementation group: 'org.jooq', name: 'jooq', version: '3.19.13'
+    implementation group: 'org.jooq', name: 'jooq-meta', version: '3.19.13'
+    implementation group: 'org.jooq', name: 'jooq-codegen', version: '3.19.13'
+    jooqGenerator group: 'com.h2database', name: 'h2', version: '2.2.224'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -51,4 +62,83 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// JOOQ 설정
+jooq {
+    version = '3.19.13'
+    edition = JooqEdition.OSS
+
+    configurations {
+        main {  // JOOQ 설정의 이름
+            generateSchemaSourceOnCompilation = true
+
+            generationTool {
+                logging = org.jooq.meta.jaxb.Logging.WARN
+                jdbc {
+                    driver = 'org.h2.Driver'
+                    url = "jdbc:h2:file:${projectDir}/build/data/testdb;MODE=PostgreSQL;AUTO_SERVER=TRUE;DEFAULT_NULL_ORDERING=HIGH"
+                    user = 'sa'
+                    password = ''
+                    properties {
+                        property {
+                            key = 'ssl'
+                            value = 'true'
+                        }
+                    }
+                }
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = 'org.jooq.meta.h2.H2Database' // H2 방언으로 변경
+                        inputSchema = 'PUBLIC' // H2 에서는 대문자 사용
+                        forcedTypes {
+                            // 필요 시 H2에서 지원하는 타입으로 설정하거나 제거
+                            /*
+                            forcedType {
+                                name = 'varchar'
+                                includeExpression = '.*'
+                                includeTypes = 'VARCHAR'
+                            }
+                            */
+                        }
+                    }
+                    generate {
+                        deprecated = false
+                        records = true
+                        immutablePojos = true
+                        fluentSetters = true
+                    }
+                    target {
+                        packageName = 'onyx.jooq' // 프로젝트의 기본 패키지와 일치시키기
+                        directory = 'build/generated-src/jooq/main'
+                    }
+                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+                }
+            }
+        }
+    }
+}
+
+// Flyway 설정
+flyway {
+    url = "jdbc:h2:file:${projectDir}/build/data/testdb;MODE=PostgreSQL;AUTO_SERVER=TRUE;DEFAULT_NULL_ORDERING=HIGH"
+    user = 'sa'
+    password = ''
+    schemas = ['PUBLIC']  // H2 에서는 대문자 사용
+    locations = ['filesystem:src/main/resources/db/migration']
+}
+
+// JOOQ 생성 태스크가 Flyway 마이그레이션에 의존하도록 설정
+tasks.named('generateJooq').configure {
+    dependsOn tasks.named('flywayMigrate')
+}
+
+// 모든 JOOQ 의존성의 버전을 일치시키기 위한 설정
+configurations.configureEach {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.jooq') {
+            details.useVersion '3.19.13'
+        }
+    }
 }

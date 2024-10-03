@@ -7,6 +7,12 @@ spring:
       dev: dev, common
       prod: prod, common
       test: local
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 0
+  jpa:
+    hibernate:
+      ddl-auto: validate
 
 storage:
   path:
@@ -18,7 +24,7 @@ spring:
     activate:
       on-profile: local
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: 'jdbc:h2:file:./build/data/testdb;MODE=PostgreSQL;AUTO_SERVER=TRUE;DEFAULT_NULL_ORDERING=HIGH'
     username: sa
     password:
     driverClassName: org.h2.Driver

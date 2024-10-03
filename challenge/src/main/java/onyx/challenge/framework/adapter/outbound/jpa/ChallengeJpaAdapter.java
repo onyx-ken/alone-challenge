@@ -24,11 +24,4 @@ public class ChallengeJpaAdapter implements ChallengeRepository {
         return challengeJPARepository.findById(id).orElseThrow(()
                 -> new IllegalArgumentException("챌린지가 존재하지 않습니다.")).toDomain();
     }
-
-    @Override
-    public List<Challenge> loadAll() {
-        return challengeJPARepository.findAllByActiveIsTrueOrderByPeriodStartDateDesc()
-                .stream().map(ChallengeJPAEntity::toDomain).toList();
-    }
-
 }
