@@ -2,7 +2,7 @@ package onyx.challenge.application.port.inbound;
 
 import onyx.challenge.application.dto.ChallengeInputDTO;
 import onyx.challenge.application.dto.ChallengeOutputDTO;
-import onyx.challenge.application.dto.FileInputData;
+import onyx.challenge.application.dto.FileData;
 import onyx.challenge.application.port.outbound.ChallengeImageRepository;
 import onyx.challenge.application.port.outbound.ChallengeRepository;
 import onyx.challenge.application.port.outbound.FileStorage;
@@ -49,7 +49,7 @@ class CreateChallengeUseCaseTest {
 
     @BeforeEach
     public void setUp() {
-        FileInputData fileInputData = FileInputData.create(
+        FileData fileData = FileData.create(
                 "테스트 파일.jpg",
                 "테스트 데이터".getBytes(StandardCharsets.UTF_8),
                 "image/jpeg"
@@ -63,7 +63,7 @@ class CreateChallengeUseCaseTest {
                 .mainContent("Run 5K")
                 .additionalContent("Do It!")
                 .goalType("POSITIVE")
-                .attachedImages(List.of(fileInputData))
+                .attachedImages(List.of(fileData))
                 .build();
     }
 

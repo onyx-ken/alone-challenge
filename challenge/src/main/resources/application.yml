@@ -56,6 +56,8 @@ management:
   health:
     defaults:
       enabled: false
+image:
+  base-url: http://localhost:8002/challenge-images/
 
 ---
 

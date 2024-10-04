@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import onyx.challenge.application.dto.ChallengeInputDTO;
-import onyx.challenge.application.dto.FileInputData;
+import onyx.challenge.application.dto.FileData;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -45,7 +45,7 @@ public class CreateRequest {
                 .mainContent(this.mainContent)
                 .additionalContent(this.additionalContent)
                 .goalType(this.goalType)
-                .attachedImages(attachedImages.stream().map(FileInputData::convert).toList())
+                .attachedImages(attachedImages.stream().map(FileData::convert).toList())
                 .build();
     }
 }

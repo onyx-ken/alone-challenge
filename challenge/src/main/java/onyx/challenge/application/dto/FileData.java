@@ -9,19 +9,19 @@ import java.io.IOException;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class FileInputData {
+public class FileData {
 
     private final String originalFilename;
     private final byte[] content;
     private final String contentType;
 
-    public static FileInputData create(String originalFilename, byte[] content, String contentType) {
-        return new FileInputData(originalFilename, content, contentType);
+    public static FileData create(String originalFilename, byte[] content, String contentType) {
+        return new FileData(originalFilename, content, contentType);
     }
 
-    public static FileInputData convert(MultipartFile multipartFile) {
+    public static FileData convert(MultipartFile multipartFile) {
         try {
-            return new FileInputData(
+            return new FileData(
                     multipartFile.getOriginalFilename(),
                     multipartFile.getBytes(),
                     multipartFile.getContentType()

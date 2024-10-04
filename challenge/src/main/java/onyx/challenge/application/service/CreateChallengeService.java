@@ -3,7 +3,7 @@ package onyx.challenge.application.service;
 import lombok.RequiredArgsConstructor;
 import onyx.challenge.application.dto.ChallengeInputDTO;
 import onyx.challenge.application.dto.ChallengeOutputDTO;
-import onyx.challenge.application.dto.FileInputData;
+import onyx.challenge.application.dto.FileData;
 import onyx.challenge.application.port.inbound.CreateChallengeUseCase;
 import onyx.challenge.application.port.outbound.ChallengeImageRepository;
 import onyx.challenge.application.port.outbound.ChallengeRepository;
@@ -56,7 +56,7 @@ public class CreateChallengeService implements CreateChallengeUseCase {
         return ChallengeOutputDTO.from(savedChallenge, 0);
     }
 
-    private Long processImage(FileInputData fileData) {
+    private Long processImage(FileData fileData) {
         // 1. 파일 저장
         String storedFilename = UUID.randomUUID().toString();
         String filePath = fileStorage.store(fileData.getContent(), storedFilename);

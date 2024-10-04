@@ -16,5 +16,5 @@ public class ChallengeInputDTO {
     private String mainContent;
     private String additionalContent;
     private String goalType; // POSITIVE 또는 NEGATIVE
-    private List<FileInputData> attachedImages;
+    private List<FileData> attachedImages;
 }
