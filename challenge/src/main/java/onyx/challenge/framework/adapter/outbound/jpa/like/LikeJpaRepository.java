@@ -1,4 +1,4 @@
-package onyx.challenge.framework.adapter.outbound.jpa;
+package onyx.challenge.framework.adapter.outbound.jpa.like;
 
 import onyx.challenge.framework.adapter.outbound.jpa.entity.LikeJPAEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

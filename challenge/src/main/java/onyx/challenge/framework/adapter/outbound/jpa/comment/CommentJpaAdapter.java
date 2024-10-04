@@ -1,4 +1,4 @@
-package onyx.challenge.framework.adapter.outbound.jpa;
+package onyx.challenge.framework.adapter.outbound.jpa.comment;
 
 import lombok.RequiredArgsConstructor;
 import onyx.challenge.application.port.outbound.CommentRepository;

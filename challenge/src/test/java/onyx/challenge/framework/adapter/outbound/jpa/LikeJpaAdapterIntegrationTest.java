@@ -3,6 +3,7 @@ package onyx.challenge.framework.adapter.outbound.jpa;
 import onyx.challenge.application.port.outbound.LikeRepository;
 import onyx.challenge.domain.model.Like;
 import onyx.challenge.framework.adapter.outbound.jpa.entity.LikeJPAEntity;
+import onyx.challenge.framework.adapter.outbound.jpa.like.LikeJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

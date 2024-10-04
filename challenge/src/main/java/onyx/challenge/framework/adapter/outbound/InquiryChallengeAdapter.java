@@ -12,7 +12,7 @@ import static onyx.jooq.tables.Challenge.*;
 
 @Repository
 @RequiredArgsConstructor
-public class inquiryChallengeAdapter implements InquiryChallengeRepository {
+public class InquiryChallengeAdapter implements InquiryChallengeRepository {
 
     private final DSLContext dsl;
 

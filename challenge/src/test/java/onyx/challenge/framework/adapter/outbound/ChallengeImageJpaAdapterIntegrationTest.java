@@ -5,7 +5,7 @@ import onyx.challenge.application.port.outbound.FileStorage;
 import onyx.challenge.application.service.StorageFileNotFoundException;
 import onyx.challenge.domain.model.ChallengeImage;
 import onyx.challenge.framework.adapter.outbound.file.FileSystemStorage;
-import onyx.challenge.framework.adapter.outbound.jpa.ChallengeImageJpaRepository;
+import onyx.challenge.framework.adapter.outbound.jpa.image.ChallengeImageJpaRepository;
 import onyx.challenge.framework.adapter.outbound.jpa.entity.ChallengeImageJPAEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

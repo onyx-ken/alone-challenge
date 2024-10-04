@@ -1,4 +1,4 @@
-package onyx.challenge.application.dto;
+package onyx.challenge.application.dto.like;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

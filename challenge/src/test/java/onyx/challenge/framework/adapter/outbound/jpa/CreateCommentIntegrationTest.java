@@ -1,9 +1,9 @@
 package onyx.challenge.framework.adapter.outbound.jpa;
 
-import onyx.challenge.application.dto.CommentInputDTO;
-import onyx.challenge.application.dto.CommentOutputDTO;
-import onyx.challenge.application.port.outbound.CommentRepository;
+import onyx.challenge.application.dto.comment.CommentInputDTO;
+import onyx.challenge.application.dto.comment.CommentOutputDTO;
 import onyx.challenge.application.service.CreateCommentService;
+import onyx.challenge.framework.adapter.outbound.jpa.comment.CommentJpaRepository;
 import onyx.challenge.framework.adapter.outbound.jpa.entity.CommentJPAEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

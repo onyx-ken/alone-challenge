@@ -1,7 +1,7 @@
 package onyx.challenge.application.port.inbound;
 
-import onyx.challenge.application.dto.LikeInputDTO;
-import onyx.challenge.application.dto.LikeOutputDTO;
+import onyx.challenge.application.dto.like.LikeInputDTO;
+import onyx.challenge.application.dto.like.LikeOutputDTO;
 import onyx.challenge.application.port.outbound.LikeRepository;
 import onyx.challenge.application.service.AlreadyLikedException;
 import onyx.challenge.application.service.CreateLikeService;
