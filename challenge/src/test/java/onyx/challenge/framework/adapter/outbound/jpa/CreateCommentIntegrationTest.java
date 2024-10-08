@@ -2,15 +2,25 @@ package onyx.challenge.framework.adapter.outbound.jpa;
 
 import onyx.challenge.application.dto.comment.CommentInputDTO;
 import onyx.challenge.application.dto.comment.CommentOutputDTO;
+import onyx.challenge.application.port.outbound.ChallengeRepository;
 import onyx.challenge.application.service.CreateCommentService;
+import onyx.challenge.domain.model.Challenge;
+import onyx.challenge.domain.vo.GoalContent;
+import onyx.challenge.domain.vo.GoalType;
+import onyx.challenge.domain.vo.Period;
 import onyx.challenge.framework.adapter.outbound.jpa.comment.CommentJpaRepository;
 import onyx.challenge.framework.adapter.outbound.jpa.entity.CommentJPAEntity;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,6 +35,20 @@ class CreateCommentIntegrationTest {
 
     @Autowired
     private CommentJpaRepository commentJpaRepository;
+
+    @BeforeAll
+    static void setUp(@Autowired ChallengeRepository challengeRepository) {
+        // 댓글 생성 이전에 챌린지가 등록되어 있어야 한다. (제약조건)
+        Challenge challenge = Challenge.create(
+                null,
+                1L,
+                "JohnDoe",
+                new Period(LocalDate.of(2024, 9, 19), LocalDate.of(2024, 9, 21)),
+                GoalContent.create("Run 5K", "Do It!", GoalType.POSITIVE),
+                Arrays.asList(5L, 6L)
+        );
+        challengeRepository.save(challenge);
+    }
 
     @Test
     @DisplayName("유효한 입력으로 댓글 생성 시 데이터베이스에 저장된다")

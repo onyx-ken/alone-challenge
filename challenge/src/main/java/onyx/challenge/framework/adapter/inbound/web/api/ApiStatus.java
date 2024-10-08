@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum ApiStatus {
 
     SUCCESS(200, "Success"),
+    ACCEPTED(202, "Accepted"),
     BAD_REQUEST(400, "Bad Request"),
     NOT_FOUND(404, "Not Found"),
     INTERNAL_SERVER_ERROR(500, "Internal Server Error");

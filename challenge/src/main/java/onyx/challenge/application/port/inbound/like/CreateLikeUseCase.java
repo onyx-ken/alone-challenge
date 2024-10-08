@@ -1,4 +1,4 @@
-package onyx.challenge.application.port.inbound;
+package onyx.challenge.application.port.inbound.like;
 
 import onyx.challenge.application.dto.like.LikeInputDTO;
 import onyx.challenge.application.dto.like.LikeOutputDTO;

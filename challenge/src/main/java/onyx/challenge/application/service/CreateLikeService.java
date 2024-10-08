@@ -3,7 +3,7 @@ package onyx.challenge.application.service;
 import lombok.RequiredArgsConstructor;
 import onyx.challenge.application.dto.like.LikeInputDTO;
 import onyx.challenge.application.dto.like.LikeOutputDTO;
-import onyx.challenge.application.port.inbound.CreateLikeUseCase;
+import onyx.challenge.application.port.inbound.like.CreateLikeUseCase;
 import onyx.challenge.application.port.outbound.LikeRepository;
 import onyx.challenge.domain.model.Like;
 import org.springframework.dao.DataIntegrityViolationException;
