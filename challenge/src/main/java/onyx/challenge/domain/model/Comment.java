@@ -42,6 +42,24 @@ public class Comment {
                 parentCommentId, replyToUserId, createdAt, updatedAt);
     }
 
+    public Comment update(String newContent, LocalDateTime updatedAt) {
+
+        if (newContent == null || newContent.trim().isEmpty()) {
+            throw new IllegalArgumentException("댓글 내용은 필수입니다.");
+        }
+
+        return new Comment(
+                this.commentId,
+                this.challengeId,
+                this.userId,
+                newContent,
+                this.parentCommentId,
+                this.replyToUserId,
+                this.createdAt,
+                updatedAt
+        );
+    }
+
     private Comment(Long commentId, Long challengeId, Long userId, String content,
                     Long parentCommentId, Long replyToUserId,
                     LocalDateTime createdAt, LocalDateTime updatedAt) {
