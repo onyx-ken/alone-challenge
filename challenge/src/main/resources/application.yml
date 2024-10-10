@@ -13,6 +13,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+  messages:
+    basename: errors
 
 storage:
   path:

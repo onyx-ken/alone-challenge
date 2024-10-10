@@ -2,7 +2,7 @@ package onyx.challenge.framework.adapter.outbound;
 
 import onyx.challenge.application.port.outbound.ChallengeImageRepository;
 import onyx.challenge.application.port.outbound.FileStorage;
-import onyx.challenge.application.service.StorageFileNotFoundException;
+import onyx.challenge.application.service.exceptiron.ChallengeImageNotFoundException;
 import onyx.challenge.domain.model.ChallengeImage;
 import onyx.challenge.framework.adapter.outbound.file.FileSystemStorage;
 import onyx.challenge.framework.adapter.outbound.jpa.image.ChallengeImageJpaRepository;
@@ -122,7 +122,6 @@ class ChallengeImageJpaAdapterIntegrationTest {
 
         // When & Then
         assertThatThrownBy(() -> challengeImageRepository.loadImage(nonExistentId))
-                .isInstanceOf(StorageFileNotFoundException.class)
-                .hasMessageContaining("이미지를 찾을 수 없습니다: " + nonExistentId);
+                .isInstanceOf(ChallengeImageNotFoundException.class);
     }
 }

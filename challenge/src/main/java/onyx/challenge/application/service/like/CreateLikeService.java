@@ -1,10 +1,11 @@
-package onyx.challenge.application.service;
+package onyx.challenge.application.service.like;
 
 import lombok.RequiredArgsConstructor;
 import onyx.challenge.application.dto.like.LikeInputDTO;
 import onyx.challenge.application.dto.like.LikeOutputDTO;
 import onyx.challenge.application.port.inbound.like.CreateLikeUseCase;
 import onyx.challenge.application.port.outbound.LikeRepository;
+import onyx.challenge.application.service.exceptiron.like.AlreadyLikedException;
 import onyx.challenge.domain.model.Like;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class CreateLikeService implements CreateLikeUseCase {
             return LikeOutputDTO.from(likeRepository.save(like));
         }catch (DataIntegrityViolationException e) {
             // 유니크 제약 조건 위반 시 예외 처리
-            throw new AlreadyLikedException("이미 좋아요를 누른 챌린지입니다.");
+            throw new AlreadyLikedException(like.getChallengeId());
         }
     }
 }

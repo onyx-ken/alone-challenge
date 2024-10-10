@@ -1,4 +1,4 @@
-package onyx.challenge.framework.adapter.inbound.web;
+package onyx.challenge.framework.adapter.inbound.web.like;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

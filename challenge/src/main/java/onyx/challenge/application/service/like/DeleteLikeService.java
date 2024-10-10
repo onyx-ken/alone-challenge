@@ -1,12 +1,14 @@
-package onyx.challenge.application.service;
+package onyx.challenge.application.service.like;
 
 import lombok.RequiredArgsConstructor;
 import onyx.challenge.application.dto.like.LikeInputDTO;
 import onyx.challenge.application.port.inbound.like.DeleteLikeUseCase;
 import onyx.challenge.application.port.outbound.LikeRepository;
+import onyx.challenge.application.service.exceptiron.like.LikeNotFoundException;
 import onyx.challenge.domain.model.Like;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -20,7 +22,7 @@ public class DeleteLikeService implements DeleteLikeUseCase {
         Like like = likeRepository.findByChallengeIdAndUserId(
                 likeInputDTO.getChallengeId(),
                 likeInputDTO.getUserId()
-        ).orElseThrow(() -> new LikeNotFoundException("좋아요가 존재하지 않습니다."));
+        ).orElseThrow(() -> new LikeNotFoundException(likeInputDTO.getChallengeId(), likeInputDTO.getUserId()));
 
         likeRepository.deleteById(like.getLikeId());
     }

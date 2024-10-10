@@ -2,7 +2,6 @@ package onyx.challenge.framework.adapter.outbound.jpa.like;
 
 import lombok.RequiredArgsConstructor;
 import onyx.challenge.application.port.outbound.LikeRepository;
-import onyx.challenge.application.service.LikeNotFoundException;
 import onyx.challenge.domain.model.Like;
 import onyx.challenge.framework.adapter.outbound.jpa.entity.LikeJPAEntity;
 import org.springframework.stereotype.Repository;
@@ -21,9 +20,8 @@ public class LikeJpaAdapter implements LikeRepository {
     }
 
     @Override
-    public Like load(Long likeId) {
-        return likeJpaRepository.findById(likeId).orElseThrow(() ->
-                new LikeNotFoundException("좋아요가 존재하지 않습니다.")).toDomain();
+    public Optional<Like> load(Long likeId) {
+        return likeJpaRepository.findById(likeId).map(LikeJPAEntity::toDomain);
     }
 
     @Override

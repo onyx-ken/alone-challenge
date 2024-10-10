@@ -15,6 +15,7 @@ public class Comment {
     private final Long replyToUserId; // 대댓글의 경우 답글 대상 사용자 ID
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
+    private final boolean isDeleted;
 
     public static Comment create(Long commentId, Long challengeId, Long userId, String content,
                                  Long parentCommentId, Long replyToUserId,
@@ -22,12 +23,12 @@ public class Comment {
 
         validateRequiredFields(challengeId, userId, content);
 
-        if (parentCommentId != null && replyToUserId != null) {
-            // 대댓글에 대한 로직 처리 (답글 대상이 존재)
-        } else if (parentCommentId != null) {
-            // 대댓글 (답글 대상 없음)
-        } else {
-            // 최상위 댓글
+        if (parentCommentId == null && replyToUserId != null) {
+            throw new IllegalArgumentException("대댓글의 대상 ID가 없습니다.");
+        }
+
+        if (replyToUserId == null && parentCommentId != null) {
+            throw new IllegalArgumentException("대댓글의 대상 유저 ID가 없습니다.");
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -39,13 +40,21 @@ public class Comment {
         }
 
         return new Comment(commentId, challengeId, userId, content,
-                parentCommentId, replyToUserId, createdAt, updatedAt);
+                parentCommentId, replyToUserId, createdAt, updatedAt, false);
     }
 
-    public Comment update(String newContent, LocalDateTime updatedAt) {
+    public Comment update(String newContent, Long challengeId, LocalDateTime updatedAt) {
+
+        if (this.isDeleted) {
+            throw new IllegalStateException("삭제된 댓글은 수정할 수 없습니다.");
+        }
 
         if (newContent == null || newContent.trim().isEmpty()) {
             throw new IllegalArgumentException("댓글 내용은 필수입니다.");
+        }
+
+        if (!this.challengeId.equals(challengeId)) {
+            throw new IllegalStateException("기존의 챌린지에 속한 댓글만 수정할 수 있습니다.");
         }
 
         return new Comment(
@@ -56,14 +65,37 @@ public class Comment {
                 this.parentCommentId,
                 this.replyToUserId,
                 this.createdAt,
-                updatedAt
+                updatedAt,
+                false
+        );
+    }
+
+    public Comment delete(Long challengeId, LocalDateTime updatedAt) {
+
+        if (this.isDeleted) {
+            throw new IllegalStateException("이미 삭제된 댓글 입니다.");
+        }
+
+        if (!this.challengeId.equals(challengeId)) {
+            throw new IllegalStateException("기존의 챌린지에 속한 댓글만 삭제할 수 있습니다.");
+        }
+
+        return new Comment(
+                this.commentId,
+                this.challengeId,
+                this.userId,
+                this.content,
+                this.parentCommentId,
+                this.replyToUserId,
+                this.createdAt,
+                updatedAt,
+                true
         );
     }
 
     private Comment(Long commentId, Long challengeId, Long userId, String content,
                     Long parentCommentId, Long replyToUserId,
-                    LocalDateTime createdAt, LocalDateTime updatedAt) {
-
+                    LocalDateTime createdAt, LocalDateTime updatedAt, boolean isDeleted) {
         this.commentId = commentId;
         this.challengeId = challengeId;
         this.userId = userId;
@@ -72,6 +104,7 @@ public class Comment {
         this.replyToUserId = replyToUserId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.isDeleted = isDeleted;
     }
 
     private static void validateRequiredFields(Long challengeId, Long userId, String content) {
@@ -85,5 +118,4 @@ public class Comment {
             throw new IllegalArgumentException("댓글 내용은 필수입니다.");
         }
     }
-
 }

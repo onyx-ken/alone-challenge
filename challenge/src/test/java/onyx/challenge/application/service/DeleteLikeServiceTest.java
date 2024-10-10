@@ -2,6 +2,8 @@ package onyx.challenge.application.service;
 
 import onyx.challenge.application.dto.like.LikeInputDTO;
 import onyx.challenge.application.port.outbound.LikeRepository;
+import onyx.challenge.application.service.exceptiron.like.LikeNotFoundException;
+import onyx.challenge.application.service.like.DeleteLikeService;
 import onyx.challenge.domain.model.Like;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

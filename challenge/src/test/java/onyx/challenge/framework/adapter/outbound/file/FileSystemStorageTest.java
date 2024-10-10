@@ -1,8 +1,8 @@
 package onyx.challenge.framework.adapter.outbound.file;
 
 
-import onyx.challenge.application.service.StorageException;
-import onyx.challenge.application.service.StorageFileNotFoundException;
+import onyx.challenge.application.service.exceptiron.file.FileNotFoundException;
+import onyx.challenge.application.service.exceptiron.file.StorageException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -78,7 +78,7 @@ class FileSystemStorageTest {
 
         // When & Then
         assertThatThrownBy(() -> fileSystemStorage.load(storedFilename))
-                .isInstanceOf(StorageFileNotFoundException.class)
+                .isInstanceOf(FileNotFoundException.class)
                 .hasMessageContaining("파일 로드 실패");
     }
 

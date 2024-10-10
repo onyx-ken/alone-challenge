@@ -1,4 +1,4 @@
-package onyx.challenge.application.service;
+package onyx.challenge.application.service.comment;
 
 import lombok.RequiredArgsConstructor;
 import onyx.challenge.application.dto.comment.CommentInputDTO;
@@ -30,8 +30,6 @@ public class CreateCommentService implements CreateCommentUseCase {
                 null
         );
 
-        Comment savedComment = commentRepository.save(comment);
-
-        return CommentOutputDTO.from(savedComment);
+        return CommentOutputDTO.from(commentRepository.save(comment));
     }
 }

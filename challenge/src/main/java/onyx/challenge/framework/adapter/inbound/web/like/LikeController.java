@@ -1,4 +1,4 @@
-package onyx.challenge.framework.adapter.inbound.web;
+package onyx.challenge.framework.adapter.inbound.web.like;
 
 import lombok.RequiredArgsConstructor;
 import onyx.challenge.application.dto.like.LikeInputDTO;

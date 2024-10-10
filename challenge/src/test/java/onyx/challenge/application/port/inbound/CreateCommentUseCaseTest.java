@@ -3,7 +3,7 @@ package onyx.challenge.application.port.inbound;
 import onyx.challenge.application.dto.comment.CommentInputDTO;
 import onyx.challenge.application.dto.comment.CommentOutputDTO;
 import onyx.challenge.application.port.outbound.CommentRepository;
-import onyx.challenge.application.service.CreateCommentService;
+import onyx.challenge.application.service.comment.CreateCommentService;
 import onyx.challenge.domain.model.Comment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

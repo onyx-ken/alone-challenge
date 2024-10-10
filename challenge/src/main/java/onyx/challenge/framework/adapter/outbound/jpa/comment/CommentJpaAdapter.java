@@ -24,28 +24,12 @@ public class CommentJpaAdapter implements CommentRepository {
     }
 
     @Override
-    public Comment load(Long commentId) {
-        return commentJpaRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found")).toDomain();
-    }
-
-    @Override
-    public Comment update(Comment comment) {
-        CommentJPAEntity commentJPAEntity = commentJpaRepository.findById(comment.getCommentId())
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
-        commentJPAEntity.setContent(comment.getContent());
-        commentJPAEntity.setUpdatedAt(LocalDateTime.now());
-
-        return commentJPAEntity.toDomain();
-    }
-
-    @Override
-    public void deleteById(Long commentId) {
-
+    public Optional<Comment> load(Long commentId) {
+        return commentJpaRepository.findById(commentId).map(CommentJPAEntity::toDomain);
     }
 
     @Override
     public List<Comment> getListByChallengeId(Long challengeId) {
-        return List.of();
+        return commentJpaRepository.getAllByChallengeId(challengeId).stream().map(CommentJPAEntity::toDomain).toList();
     }
 }

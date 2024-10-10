@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -49,7 +50,7 @@ class InquiryChallengeUseCaseTest {
         );
         int likeCount = 10;
 
-        given(challengeRepository.load(challengeId)).willReturn(challenge);
+        given(challengeRepository.load(challengeId)).willReturn(Optional.of(challenge));
         given(likeRepository.countByChallengeId(challengeId)).willReturn(likeCount);
 
         // When

@@ -7,6 +7,7 @@ import lombok.Data;
 @Builder
 public class CommentModifyDTO {
     private Long commentId;
+    private Long challengeId;
     private Long userId;
     private String content;
 }

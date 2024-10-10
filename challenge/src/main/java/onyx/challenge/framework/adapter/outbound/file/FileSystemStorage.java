@@ -2,8 +2,10 @@ package onyx.challenge.framework.adapter.outbound.file;
 
 import lombok.Setter;
 import onyx.challenge.application.port.outbound.FileStorage;
-import onyx.challenge.application.service.StorageException;
-import onyx.challenge.application.service.StorageFileNotFoundException;
+import onyx.challenge.application.service.exceptiron.file.FileEmptyException;
+import onyx.challenge.application.service.exceptiron.file.FileNotFoundException;
+import onyx.challenge.application.service.exceptiron.file.process.FileDeleteFailException;
+import onyx.challenge.application.service.exceptiron.file.process.FileSaveFailException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +27,7 @@ public class FileSystemStorage implements FileStorage {
     public String store(byte[] data, String storedFilename) {
         try {
             if (data.length == 0) {
-                throw new StorageException("빈 파일은 저장할 수 없습니다.");
+                throw new FileEmptyException();
             }
             Path destinationFile = rootLocation.resolve(storedFilename).normalize().toAbsolutePath();
 
@@ -34,7 +36,7 @@ public class FileSystemStorage implements FileStorage {
 
             return destinationFile.toString();
         } catch (IOException e) {
-            throw new StorageException("파일 저장 실패: " + storedFilename, e);
+            throw new FileSaveFailException(storedFilename);
         }
     }
 
@@ -44,7 +46,7 @@ public class FileSystemStorage implements FileStorage {
             Path filePath = rootLocation.resolve(storedFilename).normalize().toAbsolutePath();
             return Files.readAllBytes(filePath);
         } catch (IOException e) {
-            throw new StorageFileNotFoundException("파일 로드 실패: " + storedFilename, e);
+            throw new FileNotFoundException(storedFilename);
         }
     }
 
@@ -54,7 +56,7 @@ public class FileSystemStorage implements FileStorage {
             Path filePath = rootLocation.resolve(storedFilename).normalize().toAbsolutePath();
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
-            throw new StorageException("파일 삭제 실패: " + storedFilename, e);
+            throw new FileDeleteFailException(storedFilename);
         }
     }
 }
