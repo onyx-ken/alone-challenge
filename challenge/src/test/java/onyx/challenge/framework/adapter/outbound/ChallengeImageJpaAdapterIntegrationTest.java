@@ -72,6 +72,8 @@ class ChallengeImageJpaAdapterIntegrationTest {
         byte[] fileContent = "테스트 이미지 데이터".getBytes(StandardCharsets.UTF_8);
         String contentType = "image/jpeg";
         long fileSize = fileContent.length;
+        int imageOrder = 1;
+        ChallengeImage.ImageType type = ChallengeImage.ImageType.USER_UPLOAD;
 
         // 파일 저장
         String filePath = fileStorage.store(fileContent, storedFilename);
@@ -83,7 +85,9 @@ class ChallengeImageJpaAdapterIntegrationTest {
                 storedFilename,
                 filePath,
                 fileSize,
-                contentType
+                contentType,
+                imageOrder,
+                type
         );
 
         // When

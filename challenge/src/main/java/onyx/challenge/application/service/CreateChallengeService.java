@@ -16,6 +16,7 @@ import onyx.challenge.domain.vo.Period;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -32,9 +33,19 @@ public class CreateChallengeService implements CreateChallengeUseCase {
     @Override
     public ChallengeOutputDTO createChallenge(ChallengeInputDTO challengeInputDTO) {
         // 1. 이미지 저장
-        List<Long> attachedImageIds = challengeInputDTO.getAttachedImages().stream()
-                .map(this::processImage)
-                .collect(Collectors.toList());
+        List<Long> imageIds = new ArrayList<>();
+        List<ChallengeInputDTO.ImageData> images = challengeInputDTO.getAttachedImages();
+
+        if (images != null && !images.isEmpty()) {
+            for (ChallengeInputDTO.ImageData imageData : images) {
+                Long imageId = processImage(
+                        imageData.getFileData(),
+                        imageData.getOrder(),
+                        imageData.getType()
+                );
+                imageIds.add(imageId);
+            }
+        }
 
         // 2. 도메인 모델 생성
         Challenge challenge = Challenge.create(
@@ -47,7 +58,7 @@ public class CreateChallengeService implements CreateChallengeUseCase {
                         challengeInputDTO.getAdditionalContent(),
                         GoalType.valueOf(challengeInputDTO.getGoalType())
                 ),
-                attachedImageIds
+                imageIds
         );
 
         // 3. Challenge 저장
@@ -56,7 +67,11 @@ public class CreateChallengeService implements CreateChallengeUseCase {
         return ChallengeOutputDTO.from(savedChallenge, 0);
     }
 
-    private Long processImage(FileData fileData) {
+    private Long processImage(FileData fileData, int order, ChallengeImage.ImageType type) {
+        if (fileData == null) {
+            throw new IllegalArgumentException("파일 데이터는 필수입니다.");
+        }
+
         // 1. 파일 저장
         String storedFilename = UUID.randomUUID().toString();
         String filePath = fileStorage.store(fileData.getContent(), storedFilename);
@@ -68,7 +83,9 @@ public class CreateChallengeService implements CreateChallengeUseCase {
                 storedFilename,
                 filePath,
                 fileData.getContent().length,
-                fileData.getContentType()
+                fileData.getContentType(),
+                order,
+                type
         );
 
         // 3. 메타데이터 저장

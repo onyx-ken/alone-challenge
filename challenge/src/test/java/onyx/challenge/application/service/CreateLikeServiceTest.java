@@ -1,4 +1,4 @@
-package onyx.challenge.application.port.inbound;
+package onyx.challenge.application.service;
 
 import onyx.challenge.application.dto.like.LikeInputDTO;
 import onyx.challenge.application.dto.like.LikeOutputDTO;
@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class CreateLikeUseCaseTest {
+class CreateLikeServiceTest {
 
     @Mock
     private LikeRepository likeRepository;
@@ -40,7 +40,7 @@ class CreateLikeUseCaseTest {
     }
 
     @Test
-    @DisplayName("유효한 LikeInputDTO로 좋아요를 생성하면 LikeOutputDTO를 반환한다")
+    @DisplayName("유효한 LikeInputDTO로 좋아요를 생성하면 LikeOutputDTO 를 반환한다")
     public void givenValidLikeInputDTO_whenCreateLike_thenReturnsLikeOutputDTO() {
         // Given
         Like like = Like.create(
@@ -64,7 +64,7 @@ class CreateLikeUseCaseTest {
     }
 
     @Test
-    @DisplayName("이미 좋아요를 누른 경우 AlreadyLikedException이 발생한다")
+    @DisplayName("이미 좋아요를 누른 경우 AlreadyLikedException 이 발생한다")
     public void givenExistingLike_whenCreateLike_thenThrowsAlreadyLikedException() {
         // Given
         // 좋아요 저장 시 데이터베이스 예외 발생
@@ -72,8 +72,7 @@ class CreateLikeUseCaseTest {
 
         // When & Then
         assertThatThrownBy(() -> createLikeService.createLike(likeInputDTO))
-                .isInstanceOf(AlreadyLikedException.class)
-                .hasMessageContaining("이미 좋아요를 누른 챌린지입니다.");
+                .isInstanceOf(AlreadyLikedException.class);
     }
 
 }

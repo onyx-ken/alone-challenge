@@ -38,7 +38,7 @@ public class Challenge {
                 goalContent != null ? goalContent : this.goalContent,
                 attachedImageIds != null ? attachedImageIds : this.attachedImageIds,
                 result != null ? result : this.result,
-                this.isActive == isActive
+                isActive
 
         );
     }

@@ -1,4 +1,4 @@
-package onyx.challenge.application.port.inbound;
+package onyx.challenge.application.service;
 
 import onyx.challenge.application.dto.comment.CommentInputDTO;
 import onyx.challenge.application.dto.comment.CommentOutputDTO;
@@ -17,7 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class CreateCommentUseCaseTest {
+class CreateCommentServiceTest {
 
     @Mock
     private CommentRepository commentRepository;
@@ -64,10 +64,11 @@ class CreateCommentUseCaseTest {
                 .userId(101L)
                 .content("대댓글입니다.")
                 .parentCommentId(10L)
+                .replyToUserId(201L)
                 .build();
 
         Comment comment = Comment.create(null, inputDTO.getChallengeId(), inputDTO.getUserId(),
-                inputDTO.getContent(), inputDTO.getParentCommentId(), null, null, null);
+                inputDTO.getContent(), inputDTO.getParentCommentId(), inputDTO.getReplyToUserId(), null, null);
 
         Comment savedComment = Comment.create(2L, comment.getChallengeId(), comment.getUserId(),
                 comment.getContent(), comment.getParentCommentId(), comment.getReplyToUserId(),

@@ -59,7 +59,7 @@ class CommentTest {
         Long userId = 101L;
         String content = "대댓글입니다.";
         Long parentCommentId = 10L; // 최상위 댓글 ID
-        Long replyToUserId = null;
+        Long replyToUserId = 2L;
 
         // When
         Comment replyComment = Comment.create(null, challengeId, userId, content,
@@ -68,7 +68,7 @@ class CommentTest {
         // Then
         assertThat(replyComment).isNotNull();
         assertThat(replyComment.getParentCommentId()).isEqualTo(parentCommentId);
-        assertThat(replyComment.getReplyToUserId()).isNull();
+        assertThat(replyComment.getReplyToUserId()).isEqualTo(replyToUserId);
         assertThat(replyComment.isDeleted()).isFalse();
     }
 
@@ -198,4 +198,136 @@ class CommentTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("이미 삭제된 댓글 입니다.");
     }
+
+    @Test
+    @DisplayName("parentCommentId가 null이고 replyToUserId가 존재하면 예외가 발생한다")
+    void whenParentCommentIdIsNullAndReplyToUserIdExists_thenThrowsException() {
+        // Given
+        Long challengeId = 1L;
+        Long userId = 100L;
+        String content = "잘못된 대댓글";
+        Long parentCommentId = null;
+        Long replyToUserId = 200L;
+
+        // When & Then
+        assertThatThrownBy(() -> Comment.create(null, challengeId, userId, content,
+                parentCommentId, replyToUserId, null, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("대댓글의 대상 ID가 없습니다.");
+    }
+
+    @Test
+    @DisplayName("parentCommentId가 존재하고 replyToUserId가 null이면 예외가 발생한다")
+    void whenParentCommentIdExistsAndReplyToUserIdIsNull_thenThrowsException() {
+        // Given
+        Long challengeId = 1L;
+        Long userId = 100L;
+        String content = "잘못된 대댓글";
+        Long parentCommentId = 10L;
+        Long replyToUserId = null;
+
+        // When & Then
+        assertThatThrownBy(() -> Comment.create(null, challengeId, userId, content,
+                parentCommentId, replyToUserId, null, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("대댓글의 대상 유저 ID가 없습니다.");
+    }
+
+    @Test
+    @DisplayName("댓글 수정 시 내용이 null이면 예외가 발생한다")
+    void whenUpdatingCommentWithNullContent_thenThrowsException() {
+        // Given
+        Long commentId = 1L;
+        Long challengeId = 1L;
+        Long userId = 100L;
+        String originalContent = "원본 댓글 내용";
+        String newContent = null;
+        LocalDateTime createdAt = LocalDateTime.now();
+
+        Comment comment = Comment.create(commentId, challengeId, userId, originalContent,
+                null, null, createdAt, null);
+
+        // When & Then
+        assertThatThrownBy(() -> comment.update(newContent, challengeId, LocalDateTime.now()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("댓글 내용은 필수입니다.");
+    }
+
+    @Test
+    @DisplayName("댓글 수정 시 내용이 빈 문자열이면 예외가 발생한다")
+    void whenUpdatingCommentWithEmptyContent_thenThrowsException() {
+        // Given
+        Long commentId = 1L;
+        Long challengeId = 1L;
+        Long userId = 100L;
+        String originalContent = "원본 댓글 내용";
+        String newContent = "   ";
+        LocalDateTime createdAt = LocalDateTime.now();
+
+        Comment comment = Comment.create(commentId, challengeId, userId, originalContent,
+                null, null, createdAt, null);
+
+        // When & Then
+        assertThatThrownBy(() -> comment.update(newContent, challengeId, LocalDateTime.now()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("댓글 내용은 필수입니다.");
+    }
+
+    @Test
+    @DisplayName("댓글 수정 시 다른 challengeId를 사용하면 예외가 발생한다")
+    void whenUpdatingCommentWithDifferentChallengeId_thenThrowsException() {
+        // Given
+        Long commentId = 1L;
+        Long challengeId = 1L;
+        Long differentChallengeId = 2L;
+        Long userId = 100L;
+        String content = "댓글 내용";
+        LocalDateTime createdAt = LocalDateTime.now();
+
+        Comment comment = Comment.create(commentId, challengeId, userId, content,
+                null, null, createdAt, null);
+
+        // When & Then
+        assertThatThrownBy(() -> comment.update("수정된 내용", differentChallengeId, LocalDateTime.now()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("기존의 챌린지에 속한 댓글만 수정할 수 있습니다.");
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 시 다른 challengeId를 사용하면 예외가 발생한다")
+    void whenDeletingCommentWithDifferentChallengeId_thenThrowsException() {
+        // Given
+        Long commentId = 1L;
+        Long challengeId = 1L;
+        Long differentChallengeId = 2L;
+        Long userId = 100L;
+        String content = "댓글 내용";
+        LocalDateTime createdAt = LocalDateTime.now();
+
+        Comment comment = Comment.create(commentId, challengeId, userId, content,
+                null, null, createdAt, null);
+
+        // When & Then
+        assertThatThrownBy(() -> comment.delete(differentChallengeId, LocalDateTime.now()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("기존의 챌린지에 속한 댓글만 삭제할 수 있습니다.");
+    }
+
+    @Test
+    @DisplayName("createdAt과 updatedAt이 null이면 현재 시간으로 설정된다")
+    void whenCreatedAtAndUpdatedAtAreNull_thenSetToCurrentTime() {
+        // Given
+        Long challengeId = 1L;
+        Long userId = 100L;
+        String content = "댓글 내용";
+
+        // When
+        Comment comment = Comment.create(null, challengeId, userId, content,
+                null, null, null, null);
+
+        // Then
+        assertThat(comment.getCreatedAt()).isNotNull();
+        assertThat(comment.getUpdatedAt()).isNotNull();
+    }
+
 }

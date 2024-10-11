@@ -34,7 +34,7 @@ public class CreateRequest {
     @NotBlank(message = "goalType은 필수입니다.")
     private String goalType; // POSITIVE 또는 NEGATIVE
 
-    private List<MultipartFile> attachedImages = new ArrayList<>();
+    private List<ImageData> images = new ArrayList<>();
 
     public ChallengeInputDTO toDTO() {
         return ChallengeInputDTO.builder()
@@ -45,7 +45,13 @@ public class CreateRequest {
                 .mainContent(this.mainContent)
                 .additionalContent(this.additionalContent)
                 .goalType(this.goalType)
-                .attachedImages(attachedImages.stream().map(FileData::convert).toList())
+                .attachedImages(images.stream()
+                        .map(imageData -> new ChallengeInputDTO.ImageData(
+                                FileData.convert(imageData.getFile()),
+                                imageData.getOrder(),
+                                imageData.getType()
+                        ))
+                        .toList())
                 .build();
     }
 }

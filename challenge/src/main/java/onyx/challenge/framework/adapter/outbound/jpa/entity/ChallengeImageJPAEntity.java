@@ -31,6 +31,11 @@ public class ChallengeImageJPAEntity {
     @Column(nullable = false)
     private String contentType; // MIME 타입
 
+    private int order; // 이미지 순서
+
+    @Enumerated(EnumType.STRING)
+    private ChallengeImage.ImageType imageType;
+
     // 도메인 엔티티로부터 변환 메서드
     public static ChallengeImageJPAEntity fromDomain(ChallengeImage image) {
         return new ChallengeImageJPAEntity(
@@ -39,7 +44,9 @@ public class ChallengeImageJPAEntity {
                 image.getStoredFilename(),
                 image.getFilePath(),
                 image.getFileSize(),
-                image.getContentType()
+                image.getContentType(),
+                image.getOrder(),
+                image.getType()
         );
     }
 
@@ -51,23 +58,27 @@ public class ChallengeImageJPAEntity {
                 this.storedFilename,
                 this.filePath,
                 this.fileSize,
-                this.contentType
+                this.contentType,
+                this.order,
+                this.imageType
         );
     }
 
     // 생성자
     private ChallengeImageJPAEntity(Long id, String originalFilename, String storedFilename,
-                                    String filePath,long fileSize, String contentType) {
+                                    String filePath,long fileSize, String contentType, int order, ChallengeImage.ImageType imageType) {
         this.id = id;
         this.originalFilename = originalFilename;
         this.storedFilename = storedFilename;
         this.filePath = filePath;
         this.fileSize = fileSize;
         this.contentType = contentType;
+        this.order = order;
+        this.imageType = imageType;
     }
 
     static ChallengeImageJPAEntity testInstance(Long id, String originalFilename, String storedFilename,
-                                       String filePath, long fileSize, String contentType) {
+                                       String filePath, long fileSize, String contentType, int order, ChallengeImage.ImageType imageType) {
         ChallengeImageJPAEntity entity = new ChallengeImageJPAEntity();
         entity.id = id;
         entity.originalFilename = originalFilename;
@@ -75,6 +86,8 @@ public class ChallengeImageJPAEntity {
         entity.filePath = filePath;
         entity.fileSize = fileSize;
         entity.contentType = contentType;
+        entity.order = order;
+        entity.imageType = imageType;
         return entity;
     }
 }

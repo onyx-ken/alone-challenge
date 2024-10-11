@@ -113,4 +113,44 @@ class ChallengeTest {
                 .hasMessageContaining("회원 ID는 필수입니다.");
     }
 
+    @Test
+    @DisplayName("update 메서드로 isActive 필드를 업데이트하면 새로운 객체에 반영된다")
+    void whenUpdatingIsActive_thenNewObjectHasUpdatedIsActive() {
+        // Given
+        Long challengeId = 1L;
+        Long userId = 100L;
+        String nickName = "챌린저";
+        Period period = new Period(LocalDate.now(), LocalDate.now().plusDays(7));
+        GoalContent goalContent = GoalContent.create("목표 내용", "추가 내용", GoalType.POSITIVE);
+        List<Long> attachedImageIds = Arrays.asList(10L, 11L);
+
+        Challenge challenge = Challenge.create(challengeId, userId, nickName, period, goalContent, attachedImageIds);
+
+        // When
+        Challenge updatedChallenge = challenge.update(null, null, null, null, null, false);
+
+        // Then
+        Assertions.assertThat(updatedChallenge.isActive()).isFalse();
+    }
+
+    @Test
+    @DisplayName("ChallengeResult가 null이면 기본값으로 설정된다")
+    void whenChallengeResultIsNull_thenSetToDefault() {
+        // Given
+        Long challengeId = 1L;
+        Long userId = 100L;
+        String nickName = "챌린저";
+        Period period = new Period(LocalDate.now(), LocalDate.now().plusDays(7));
+        GoalContent goalContent = GoalContent.create("목표 내용", "추가 내용", GoalType.POSITIVE);
+        List<Long> attachedImageIds = Arrays.asList(10L, 11L);
+        ChallengeResult result = null;
+
+        // When
+        Challenge challenge = Challenge.from(challengeId, userId, nickName, period, goalContent, attachedImageIds, result, true);
+
+        // Then
+        Assertions.assertThat(challenge.getResult()).isNotNull();
+        Assertions.assertThat(challenge.getResult().getStatus()).isEqualTo(ChallengeResultStatus.ON_GOING);
+    }
+
 }

@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class LikeTest {
 
     @Test
@@ -22,10 +24,10 @@ class LikeTest {
 
         // Then
 
-        Assertions.assertThat(like.getLikeId()).isEqualTo(likeId);
-        Assertions.assertThat(like.getChallengeId()).isEqualTo(challengeId);
-        Assertions.assertThat(like.getUserId()).isEqualTo(userId);
-        Assertions.assertThat(like.getLikedAt()).isEqualTo(likedAt);
+        assertThat(like.getLikeId()).isEqualTo(likeId);
+        assertThat(like.getChallengeId()).isEqualTo(challengeId);
+        assertThat(like.getUserId()).isEqualTo(userId);
+        assertThat(like.getLikedAt()).isEqualTo(likedAt);
     }
 
     @Test
@@ -42,5 +44,22 @@ class LikeTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("challengeId와 userId는 반드시 포함되어야 합니다.");
     }
+
+    @Test
+    @DisplayName("likedAt이 null이면 현재 시간으로 설정된다")
+    void whenLikedAtIsNull_thenSetToCurrentTime() {
+        // Given
+        Long likeId = 1L;
+        Long challengeId = 100L;
+        Long userId = 200L;
+        LocalDateTime beforeCreation = LocalDateTime.now();
+
+        // When
+        Like like = Like.create(likeId, challengeId, userId, null);
+
+        // Then
+        assertThat(like.getLikedAt()).isAfterOrEqualTo(beforeCreation);
+    }
+
 
 }

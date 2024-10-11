@@ -38,7 +38,9 @@ public class ChallengeImageJpaAdapterTest {
                 "stored-filename.jpg",
                 "/path/to/stored-filename.jpg",
                 1024L,
-                "image/jpeg"
+                "image/jpeg",
+                1,
+                ChallengeImage.ImageType.USER_UPLOAD
         );
 
         ChallengeImageJPAEntity entity = ChallengeImageJPAEntity.fromDomain(image);

@@ -17,9 +17,11 @@ class ChallengeImageJPAEntityTest {
         String filePath = "/uploads/uuid-image.jpg";
         long fileSize = 1024L;
         String contentType = "image/jpeg";
+        int imageOrder = 1;
+        ChallengeImage.ImageType type = ChallengeImage.ImageType.USER_UPLOAD;
 
         ChallengeImage originalChallenge = ChallengeImage.from(id, originalFilename,
-                storedFilename, filePath, fileSize, contentType);
+                storedFilename, filePath, fileSize, contentType, imageOrder, type);
 
         // When
 
@@ -46,9 +48,11 @@ class ChallengeImageJPAEntityTest {
         String filePath = "/uploads/uuid-image.jpg";
         long fileSize = 1024L;
         String contentType = "image/jpeg";
+        int imageOrder = 1;
+        ChallengeImage.ImageType type = ChallengeImage.ImageType.USER_UPLOAD;
 
         ChallengeImageJPAEntity challengeImageEntity =
-                ChallengeImageJPAEntity.testInstance(id, originalFilename, storedFilename, filePath, fileSize, contentType);
+                ChallengeImageJPAEntity.testInstance(id, originalFilename, storedFilename, filePath, fileSize, contentType, imageOrder, type);
 
         // When
         ChallengeImage challengeImage = challengeImageEntity.toDomain();
