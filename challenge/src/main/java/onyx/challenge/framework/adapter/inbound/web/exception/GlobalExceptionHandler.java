@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleExceptionAlreadyExists(DomainException ex, Locale locale) {
         // 메시지 코드와 파라미터를 사용하여 국제화된 메시지 가져오기
         String errorMessage = messageSource.getMessage(ex.getMessageCode(), ex.getArgs(), locale);
-        ApiResponse<Void> apiResponse = ApiResponse.create(ApiStatus.INTERNAL_SERVER_ERROR, errorMessage, null);
+        ApiResponse<Void> apiResponse = ApiResponse.create(ApiStatus.CONFLICT, errorMessage, null);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(apiResponse);
     }
 

@@ -23,11 +23,6 @@ public class CreateLikeService implements CreateLikeUseCase {
     @Override
     public LikeOutputDTO createLike(LikeInputDTO likeInputDTO) {
         Like like = Like.create(null, likeInputDTO.getChallengeId(), likeInputDTO.getUserId(), LocalDateTime.now());
-        try {
-            return LikeOutputDTO.from(likeRepository.save(like));
-        }catch (DataIntegrityViolationException e) {
-            // 유니크 제약 조건 위반 시 예외 처리
-            throw new AlreadyLikedException(like.getChallengeId());
-        }
+        return LikeOutputDTO.from(likeRepository.save(like));
     }
 }
