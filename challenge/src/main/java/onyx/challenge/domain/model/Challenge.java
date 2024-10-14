@@ -20,11 +20,13 @@ public class Challenge {
     private final boolean isActive;
 
     public static Challenge from(Long challengeId, Long userId, String nickName, Period period,
-                                 GoalContent goalContent, List<Long> attachedImageIds, ChallengeResult result, boolean isActive) {
+                                 GoalContent goalContent, List<Long> attachedImageIds,
+                                 ChallengeResult result, boolean isActive) {
         return new Challenge(challengeId, userId, nickName, period, goalContent, attachedImageIds, result, isActive);
     }
 
-    public static Challenge create(Long challengeId, Long userId, String nickName, Period period, GoalContent goalContent, List<Long> attachedImageIds) {
+    public static Challenge create(Long challengeId, Long userId, String nickName, Period period,
+                                   GoalContent goalContent, List<Long> attachedImageIds) {
         return new Challenge(challengeId, userId, nickName, period, goalContent, attachedImageIds, ChallengeResult.createDefault(), true);
     }
 
@@ -39,7 +41,6 @@ public class Challenge {
                 attachedImageIds != null ? attachedImageIds : this.attachedImageIds,
                 result != null ? result : this.result,
                 isActive
-
         );
     }
 

@@ -7,6 +7,7 @@ import onyx.challenge.application.dto.ChallengeInputDTO;
 import onyx.challenge.application.dto.FileData;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,11 +48,23 @@ public class CreateRequest {
                 .goalType(this.goalType)
                 .attachedImages(images.stream()
                         .map(imageData -> new ChallengeInputDTO.ImageData(
-                                FileData.convert(imageData.getFile()),
+                                convert(imageData.getFile()),
                                 imageData.getOrder(),
                                 imageData.getType()
                         ))
                         .toList())
                 .build();
+    }
+
+    private FileData convert(MultipartFile multipartFile) {
+        try {
+            return FileData.create(
+                    multipartFile.getOriginalFilename(),
+                    multipartFile.getBytes(),
+                    multipartFile.getContentType()
+            );
+        } catch (IOException e) {
+            throw new RuntimeException("파일 읽기 실패", e);
+        }
     }
 }
