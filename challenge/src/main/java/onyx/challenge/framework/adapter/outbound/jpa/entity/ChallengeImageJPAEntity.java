@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import onyx.challenge.domain.model.ChallengeImage;
+import onyx.challenge.domain.vo.ImageType;
 
 @Entity
 @Table(name = "challenge_images")
@@ -34,7 +35,7 @@ public class ChallengeImageJPAEntity {
     private int order; // 이미지 순서
 
     @Enumerated(EnumType.STRING)
-    private ChallengeImage.ImageType imageType;
+    private ImageType imageType;
 
     // 도메인 엔티티로부터 변환 메서드
     public static ChallengeImageJPAEntity fromDomain(ChallengeImage image) {
@@ -66,7 +67,7 @@ public class ChallengeImageJPAEntity {
 
     // 생성자
     private ChallengeImageJPAEntity(Long id, String originalFilename, String storedFilename,
-                                    String filePath,long fileSize, String contentType, int order, ChallengeImage.ImageType imageType) {
+                                    String filePath,long fileSize, String contentType, int order, ImageType imageType) {
         this.id = id;
         this.originalFilename = originalFilename;
         this.storedFilename = storedFilename;
@@ -78,7 +79,7 @@ public class ChallengeImageJPAEntity {
     }
 
     static ChallengeImageJPAEntity testInstance(Long id, String originalFilename, String storedFilename,
-                                       String filePath, long fileSize, String contentType, int order, ChallengeImage.ImageType imageType) {
+                                       String filePath, long fileSize, String contentType, int order, ImageType imageType) {
         ChallengeImageJPAEntity entity = new ChallengeImageJPAEntity();
         entity.id = id;
         entity.originalFilename = originalFilename;

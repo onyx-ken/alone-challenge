@@ -4,14 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import onyx.challenge.domain.model.ChallengeImage;
-import onyx.challenge.domain.vo.ImageType;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
 @Builder
-public class ChallengeInputDTO {
+public class ChallengeModifyDTO {
+    private Long challengeId;
     private Long userId;
     private String nickName;
     private LocalDate startDate;
@@ -24,8 +24,9 @@ public class ChallengeInputDTO {
     @Data
     @AllArgsConstructor
     public static class ImageData {
+        private Long imageId;
         private FileData fileData;
         private int order;
-        private ImageType type;
+        private ChallengeImage.ImageType type;
     }
 }

@@ -2,6 +2,7 @@ package onyx.challenge.framework.adapter.outbound.jpa;
 
 import onyx.challenge.application.service.exceptiron.ChallengeImageNotFoundException;
 import onyx.challenge.domain.model.ChallengeImage;
+import onyx.challenge.domain.vo.ImageType;
 import onyx.challenge.framework.adapter.outbound.jpa.entity.ChallengeImageJPAEntity;
 import onyx.challenge.framework.adapter.outbound.jpa.image.ChallengeImageJpaAdapter;
 import onyx.challenge.framework.adapter.outbound.jpa.image.ChallengeImageJpaRepository;
@@ -40,7 +41,7 @@ public class ChallengeImageJpaAdapterTest {
                 1024L,
                 "image/jpeg",
                 1,
-                ChallengeImage.ImageType.USER_UPLOAD
+                ImageType.USER_UPLOAD
         );
 
         ChallengeImageJPAEntity entity = ChallengeImageJPAEntity.fromDomain(image);

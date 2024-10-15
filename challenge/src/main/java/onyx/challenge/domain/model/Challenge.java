@@ -5,6 +5,7 @@ import onyx.challenge.domain.vo.ChallengeResult;
 import onyx.challenge.domain.vo.GoalContent;
 import onyx.challenge.domain.vo.Period;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -32,6 +33,10 @@ public class Challenge {
 
     public Challenge update(String nickName, Period period, GoalContent goalContent, List<Long> attachedImageIds,
                             ChallengeResult result, boolean isActive) {
+        if (!this.isActive) {
+            throw new IllegalStateException("Challenge is not active");
+        }
+
         return new Challenge(
                 this.challengeId,
                 this.userId,
@@ -42,6 +47,11 @@ public class Challenge {
                 result != null ? result : this.result,
                 isActive
         );
+    }
+    public List<Long> determineImagesToDelete(List<Long> existingImageIds) {
+        List<Long> imageIdsToDelete = new ArrayList<>(this.attachedImageIds);
+        imageIdsToDelete.removeAll(existingImageIds);
+        return imageIdsToDelete;
     }
 
     private Challenge(Long challengeId, Long userId, String nickName, Period period,
@@ -72,5 +82,4 @@ public class Challenge {
             throw new IllegalArgumentException("도전 내용은 필수입니다.");
         }
     }
-
 }

@@ -24,4 +24,9 @@ public class ChallengeImageJpaAdapter implements ChallengeImageRepository {
     public Optional<ChallengeImage> loadImage(Long imageId) {
         return challengeImageJpaRepository.findById(imageId).map(ChallengeImageJPAEntity::toDomain);
     }
+
+    @Override
+    public void deleteImage(Long imageId) {
+        challengeImageJpaRepository.deleteById(imageId);
+    }
 }

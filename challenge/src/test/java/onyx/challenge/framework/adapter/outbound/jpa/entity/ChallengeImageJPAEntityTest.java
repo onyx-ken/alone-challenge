@@ -1,6 +1,7 @@
 package onyx.challenge.framework.adapter.outbound.jpa.entity;
 
 import onyx.challenge.domain.model.ChallengeImage;
+import onyx.challenge.domain.vo.ImageType;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ class ChallengeImageJPAEntityTest {
         long fileSize = 1024L;
         String contentType = "image/jpeg";
         int imageOrder = 1;
-        ChallengeImage.ImageType type = ChallengeImage.ImageType.USER_UPLOAD;
+        ImageType type = ImageType.USER_UPLOAD;
 
         ChallengeImage originalChallenge = ChallengeImage.from(id, originalFilename,
                 storedFilename, filePath, fileSize, contentType, imageOrder, type);
@@ -49,7 +50,7 @@ class ChallengeImageJPAEntityTest {
         long fileSize = 1024L;
         String contentType = "image/jpeg";
         int imageOrder = 1;
-        ChallengeImage.ImageType type = ChallengeImage.ImageType.USER_UPLOAD;
+        ImageType type = ImageType.USER_UPLOAD;
 
         ChallengeImageJPAEntity challengeImageEntity =
                 ChallengeImageJPAEntity.testInstance(id, originalFilename, storedFilename, filePath, fileSize, contentType, imageOrder, type);

@@ -1,6 +1,7 @@
 package onyx.challenge.domain.model;
 
 import lombok.Getter;
+import onyx.challenge.domain.vo.ImageType;
 
 import java.util.List;
 
@@ -73,10 +74,5 @@ public class ChallengeImage {
         if (type == null) {
             throw new IllegalArgumentException("이미지 유형은 필수입니다.");
         }
-    }
-
-    public enum ImageType {
-        USER_UPLOAD,
-        CHALLENGE_CARD
     }
 }

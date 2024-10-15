@@ -45,7 +45,7 @@ class InquiryChallengeImageServiceTest {
                 1024L,
                 "image/jpeg",
                 1,
-                ChallengeImage.ImageType.USER_UPLOAD
+                ImageType.USER_UPLOAD
         );
 
         byte[] imageContent = "image data".getBytes(StandardCharsets.UTF_8);

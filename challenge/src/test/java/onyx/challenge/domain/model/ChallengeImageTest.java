@@ -1,5 +1,6 @@
 package onyx.challenge.domain.model;
 
+import onyx.challenge.domain.vo.ImageType;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ class ChallengeImageTest {
         long fileSize = 1024L;
         String contentType = "image/jpeg";
         int imageOrder = 1;
-        ChallengeImage.ImageType type = ChallengeImage.ImageType.USER_UPLOAD;
+        ImageType type = ImageType.USER_UPLOAD;
 
         // When
         ChallengeImage challengeImage = ChallengeImage
@@ -43,7 +44,7 @@ class ChallengeImageTest {
         long fileSize = -1L; // 유효하지 않은 파일 크기
         String contentType = "invalid/type"; // 허용되지 않는 MIME 타입
         int imageOrder = 1;
-        ChallengeImage.ImageType type = ChallengeImage.ImageType.USER_UPLOAD;
+        ImageType type = ImageType.USER_UPLOAD;
 
         // When & Then
         // originalFilename이 null일 때
@@ -76,7 +77,7 @@ class ChallengeImageTest {
         long fileSize = 1024L;
         String contentType = "image/jpeg";
         int imageOrder = 1;
-        ChallengeImage.ImageType type = ChallengeImage.ImageType.USER_UPLOAD;
+        ImageType type = ImageType.USER_UPLOAD;
 
         // When & Then
         Assertions.assertThatThrownBy(() -> ChallengeImage
@@ -96,7 +97,7 @@ class ChallengeImageTest {
         long fileSize = 2048L;
         String contentType = "image/png";
         int imageOrder = 1;
-        ChallengeImage.ImageType type = ChallengeImage.ImageType.USER_UPLOAD;
+        ImageType type = ImageType.USER_UPLOAD;
 
         // When
         ChallengeImage challengeImage = ChallengeImage
@@ -117,7 +118,7 @@ class ChallengeImageTest {
         long fileSize = 4096L;
         String contentType = "application/pdf";
         int imageOrder = 1;
-        ChallengeImage.ImageType type = ChallengeImage.ImageType.USER_UPLOAD;
+        ImageType type = ImageType.USER_UPLOAD;
 
         // When & Then
         Assertions.assertThatThrownBy(() -> ChallengeImage
@@ -138,7 +139,7 @@ class ChallengeImageTest {
         long fileSize = 1024L;
         String contentType = "image/jpeg";
         int imageOrder = -1; // 음수 순서
-        ChallengeImage.ImageType type = ChallengeImage.ImageType.USER_UPLOAD;
+        ImageType type = ImageType.USER_UPLOAD;
 
         // When & Then
         Assertions.assertThatThrownBy(() -> ChallengeImage.create(id, originalFilename, storedFilename,
@@ -158,7 +159,7 @@ class ChallengeImageTest {
         long fileSize = 1024L;
         String contentType = "image/jpeg";
         int imageOrder = 1;
-        ChallengeImage.ImageType type = null; // 유형이 null
+        ImageType type = null; // 유형이 null
 
         // When & Then
         Assertions.assertThatThrownBy(() -> ChallengeImage.create(id, originalFilename, storedFilename,
@@ -178,7 +179,7 @@ class ChallengeImageTest {
         long fileSize = 1024L;
         String contentType = "image/jpeg";
         int imageOrder = 2;
-        ChallengeImage.ImageType type = ChallengeImage.ImageType.CHALLENGE_CARD;
+        ImageType type = ImageType.CHALLENGE_CARD;
 
         // When
         ChallengeImage challengeImage = ChallengeImage.create(id, originalFilename, storedFilename,

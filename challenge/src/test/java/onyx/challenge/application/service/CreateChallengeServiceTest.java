@@ -10,6 +10,7 @@ import onyx.challenge.domain.model.Challenge;
 import onyx.challenge.domain.model.ChallengeImage;
 import onyx.challenge.domain.vo.GoalContent;
 import onyx.challenge.domain.vo.GoalType;
+import onyx.challenge.domain.vo.ImageType;
 import onyx.challenge.domain.vo.Period;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ class CreateChallengeServiceTest {
 
         List<ChallengeInputDTO.ImageData> attachedImages = new ArrayList<>();
         attachedImages.add(new ChallengeInputDTO.ImageData(
-                fileData, 1, ChallengeImage.ImageType.USER_UPLOAD
+                fileData, 1, ImageType.USER_UPLOAD
         ));
 
         ChallengeInputDTO challengeInputDTO = ChallengeInputDTO.builder()

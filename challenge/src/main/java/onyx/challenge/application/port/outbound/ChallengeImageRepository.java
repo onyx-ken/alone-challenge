@@ -7,4 +7,5 @@ import java.util.Optional;
 public interface ChallengeImageRepository {
     ChallengeImage saveImage(ChallengeImage image);
     Optional<ChallengeImage> loadImage(Long imageId);
+    void deleteImage(Long imageId);
 }
