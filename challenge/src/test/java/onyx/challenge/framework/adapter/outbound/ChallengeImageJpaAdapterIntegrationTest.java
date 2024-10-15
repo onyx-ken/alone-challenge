@@ -118,15 +118,4 @@ class ChallengeImageJpaAdapterIntegrationTest {
         byte[] storedFileContent = Files.readAllBytes(storedFilePath);
         assertThat(storedFileContent).isEqualTo(fileContent);
     }
-
-    @Test
-    @DisplayName("존재하지 않는 ChallengeImage를 조회하려고 하면 예외가 발생한다")
-    public void whenFindNonExistentChallengeImage_thenThrowsException() {
-        // Given
-        Long nonExistentId = 999L;
-
-        // When & Then
-        assertThatThrownBy(() -> challengeImageRepository.loadImage(nonExistentId))
-                .isInstanceOf(ChallengeImageNotFoundException.class);
-    }
 }

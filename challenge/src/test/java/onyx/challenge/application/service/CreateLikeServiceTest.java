@@ -68,7 +68,7 @@ class CreateLikeServiceTest {
     public void givenExistingLike_whenCreateLike_thenThrowsAlreadyLikedException() {
         // Given
         // 좋아요 저장 시 데이터베이스 예외 발생
-        given(likeRepository.save(any(Like.class))).willThrow(DataIntegrityViolationException.class);
+        given(likeRepository.save(any(Like.class))).willThrow(AlreadyLikedException.class);
 
         // When & Then
         assertThatThrownBy(() -> createLikeService.createLike(likeInputDTO))

@@ -5,6 +5,7 @@ import onyx.challenge.application.port.outbound.ChallengeImageRepository;
 import onyx.challenge.application.port.outbound.FileStorage;
 import onyx.challenge.application.service.exceptiron.ChallengeImageNotFoundException;
 import onyx.challenge.domain.model.ChallengeImage;
+import onyx.challenge.domain.vo.ImageType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

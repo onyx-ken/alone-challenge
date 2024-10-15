@@ -40,7 +40,9 @@ CREATE TABLE challenge_images (
                                   stored_filename VARCHAR(255) NOT NULL,
                                   file_path VARCHAR(500) NOT NULL,
                                   file_size BIGINT NOT NULL,
-                                  content_type VARCHAR(100) NOT NULL
+                                  content_type VARCHAR(100) NOT NULL,
+                                  image_type VARCHAR(100) NOT NULL,
+                                  image_order INTEGER NOT NULL
 );
 
 CREATE TABLE likes (

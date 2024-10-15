@@ -1,16 +1,25 @@
 package onyx.challenge.framework.adapter.outbound.jpa;
 
+import onyx.challenge.application.port.outbound.ChallengeRepository;
 import onyx.challenge.application.port.outbound.LikeRepository;
+import onyx.challenge.application.service.exceptiron.like.AlreadyLikedException;
+import onyx.challenge.domain.model.Challenge;
 import onyx.challenge.domain.model.Like;
+import onyx.challenge.domain.vo.GoalContent;
+import onyx.challenge.domain.vo.GoalType;
+import onyx.challenge.domain.vo.Period;
 import onyx.challenge.framework.adapter.outbound.jpa.entity.LikeJPAEntity;
 import onyx.challenge.framework.adapter.outbound.jpa.like.LikeJpaRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,6 +34,19 @@ class LikeJpaAdapterIntegrationTest {
 
     @Autowired
     private LikeJpaRepository likeJpaRepository;
+
+    @BeforeEach
+    void setUp(@Autowired ChallengeRepository challengeRepository) {
+        Challenge challenge = Challenge.create(
+                null,
+                1L,
+                "JohnDoe",
+                new Period(LocalDate.of(2024,9,19), LocalDate.of(2024, 9 ,21)),
+                GoalContent.create("Run 5K", "Do It!", GoalType.POSITIVE),
+                Arrays.asList(5L, 6L)
+        );
+        challengeRepository.save(challenge);
+    }
 
     @Test
     @DisplayName("유효한 Like를 저장하면 데이터베이스에 저장된다")
@@ -51,21 +73,20 @@ class LikeJpaAdapterIntegrationTest {
     }
 
     @Test
-    @DisplayName("중복된 좋아요를 저장하려고 하면 DataIntegrityViolationException이 발생한다")
-    public void givenDuplicateLike_whenSave_thenDataIntegrityViolationExceptionIsThrown() {
+    @DisplayName("중복된 좋아요를 저장하려고 하면 AlreadyLikedException 이 발생한다")
+    public void givenDuplicateLike_whenSave_thenAlreadyLikedExceptionIsThrown() {
         // Given
         Long challengeId = 1L;
         Long userId = 100L;
-        Like like1 = Like.create(null, challengeId, userId, null);
+        Like like = Like.create(null, challengeId, userId, null);
         Like like2 = Like.create(null, challengeId, userId, null);
 
         // When
-        likeRepository.save(like1);
+        likeRepository.save(like);
 
         // Then
         assertThatThrownBy(() -> likeRepository.save(like2))
-                .isInstanceOf(DataIntegrityViolationException.class)
-                .hasMessageContaining("Unique index or primary key violation");
+                .isInstanceOf(AlreadyLikedException.class)
+                .hasMessageContaining("like.already.exists");
     }
-
 }

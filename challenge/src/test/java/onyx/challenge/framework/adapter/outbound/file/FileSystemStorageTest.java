@@ -67,7 +67,7 @@ class FileSystemStorageTest {
         // When & Then
         assertThatThrownBy(() -> fileSystemStorage.store(data, storedFilename))
                 .isInstanceOf(StorageException.class)
-                .hasMessageContaining("빈 파일은 저장할 수 없습니다.");
+                .hasMessageContaining("storage.empty.file");
     }
 
     @Test
@@ -79,7 +79,7 @@ class FileSystemStorageTest {
         // When & Then
         assertThatThrownBy(() -> fileSystemStorage.load(storedFilename))
                 .isInstanceOf(FileNotFoundException.class)
-                .hasMessageContaining("파일 로드 실패");
+                .hasMessageContaining("storage.load.failed");
     }
 
     @Test

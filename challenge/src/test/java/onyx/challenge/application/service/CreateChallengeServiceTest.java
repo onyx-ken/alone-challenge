@@ -27,11 +27,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CreateChallengeServiceTest {
@@ -40,19 +38,15 @@ class CreateChallengeServiceTest {
     private ChallengeRepository challengeRepository;
 
     @Mock
-    private FileStorage fileStorage;
-
-    @Mock
-    private ChallengeImageRepository challengeImageRepository;
+    private ChallengeImageProcessService challengeImageProcessService;
 
     @InjectMocks
     private CreateChallengeService createChallengeService;
 
     @Test
+    @DisplayName("유효한 ChallengeInputDTO로 챌린지를 생성하면 성공적으로 처리된다")
     public void givenValidChallengeInputDTO_whenCreateChallenge_thenReturnsChallengeOutputDTO() {
         // Given
-        // 1. 파일 저장과 메타데이터 저장의 목 객체 동작 정의
-
         FileData fileData = FileData.create(
                 "테스트 파일.jpg",
                 "테스트 데이터".getBytes(StandardCharsets.UTF_8),
@@ -75,21 +69,13 @@ class CreateChallengeServiceTest {
                 .attachedImages(attachedImages)
                 .build();
 
-        ChallengeImage savedImage = ChallengeImage.create(
-                1L,
-                challengeInputDTO.getAttachedImages().getFirst().getFileData().getOriginalFilename(),
-                "stored-filename",
-                "/path/to/stored-file",
-                challengeInputDTO.getAttachedImages().getFirst().getFileData().getContent().length,
-                challengeInputDTO.getAttachedImages().getFirst().getFileData().getContentType(),
-                challengeInputDTO.getAttachedImages().getFirst().getOrder(),
-                challengeInputDTO.getAttachedImages().getFirst().getType()
-        );
+        // Mocking ChallengeImageProcessService to return a mock image ID
+        Long mockImageId = 100L;
+        given(challengeImageProcessService.processImage(
+                any(FileData.class), anyInt(), any(ImageType.class)
+        )).willReturn(mockImageId);
 
-        given(fileStorage.store(any(byte[].class), anyString())).willReturn("/path/to/stored-file");
-        given(challengeImageRepository.saveImage(any(ChallengeImage.class))).willReturn(savedImage);
-
-        // 2. ChallengeRepository 목 객체 동작 정의
+        // Mocking ChallengeRepository to return a saved Challenge
         Challenge challenge = Challenge.create(
                 1L,
                 challengeInputDTO.getUserId(),
@@ -100,7 +86,7 @@ class CreateChallengeServiceTest {
                         challengeInputDTO.getAdditionalContent(),
                         GoalType.valueOf(challengeInputDTO.getGoalType())
                 ),
-                List.of(savedImage.getId())
+                List.of(mockImageId)
         );
 
         given(challengeRepository.save(any(Challenge.class))).willReturn(challenge);
@@ -112,9 +98,10 @@ class CreateChallengeServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getChallengeId()).isEqualTo(challenge.getChallengeId());
 
-        // 추가 검증
-        verify(fileStorage, times(1)).store(any(byte[].class), anyString());
-        verify(challengeImageRepository, times(1)).saveImage(any(ChallengeImage.class));
+        // Verify interactions
+        verify(challengeImageProcessService, times(1)).processImage(
+                any(FileData.class), anyInt(), any(ImageType.class)
+        );
         verify(challengeRepository, times(1)).save(any(Challenge.class));
     }
 
@@ -135,7 +122,51 @@ class CreateChallengeServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> createChallengeService.createChallenge(invalidInputDTO))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("회원 ID는 필수입니다.");
     }
 
+
+    @Test
+    @DisplayName("첨부 이미지가 없어도 챌린지가 성공적으로 생성된다")
+    void givenNoAttachedImages_whenCreateChallenge_thenSuccess() {
+        // Given
+        ChallengeInputDTO challengeInputDTO = ChallengeInputDTO.builder()
+                .userId(1L)
+                .nickName("JohnDoe")
+                .startDate(LocalDate.of(2024, 9, 19))
+                .endDate(LocalDate.of(2024, 9, 25))
+                .mainContent("Run 5K")
+                .additionalContent("Do It!")
+                .goalType("POSITIVE")
+                .attachedImages(Collections.emptyList())
+                .build();
+
+        // Mocking ChallengeRepository to return a saved Challenge
+        Challenge challenge = Challenge.create(
+                1L,
+                challengeInputDTO.getUserId(),
+                challengeInputDTO.getNickName(),
+                new Period(challengeInputDTO.getStartDate(), challengeInputDTO.getEndDate()),
+                GoalContent.create(
+                        challengeInputDTO.getMainContent(),
+                        challengeInputDTO.getAdditionalContent(),
+                        GoalType.valueOf(challengeInputDTO.getGoalType())
+                ),
+                Collections.emptyList()
+        );
+
+        given(challengeRepository.save(any(Challenge.class))).willReturn(challenge);
+
+        // When
+        ChallengeOutputDTO result = createChallengeService.createChallenge(challengeInputDTO);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getChallengeId()).isEqualTo(challenge.getChallengeId());
+
+        // Verify that processImage is not called
+        verify(challengeImageProcessService, never()).processImage(any(), anyInt(), any());
+        verify(challengeRepository, times(1)).save(any(Challenge.class));
+    }
 }

@@ -48,6 +48,7 @@ public class Challenge {
                 isActive
         );
     }
+
     public List<Long> determineImagesToDelete(List<Long> existingImageIds) {
         List<Long> imageIdsToDelete = new ArrayList<>(this.attachedImageIds);
         imageIdsToDelete.removeAll(existingImageIds);

@@ -96,6 +96,7 @@ class CreateCommentIntegrationTest {
                 .userId(101L)
                 .content("대댓글입니다.")
                 .parentCommentId(parentOutputDTO.getCommentId())
+                .replyToUserId(100L)
                 .build();
 
         // When

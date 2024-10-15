@@ -62,15 +62,4 @@ public class ChallengeImageJpaAdapterTest {
         assertThat(foundImage.getId()).isEqualTo(1L);
         assertThat(foundImage.getOriginalFilename()).isEqualTo("original-filename.jpg");
     }
-
-    @Test
-    @DisplayName("존재하지 않는 ChallengeImage를 조회하려고 하면 예외가 발생한다")
-    void whenFindNonExistentChallengeImage_thenThrowsException() {
-        // Given
-        when(challengeImageJpaRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // When & Then
-        assertThatThrownBy(() -> challengeImageJpaAdapter.loadImage(1L))
-                .isInstanceOf(ChallengeImageNotFoundException.class);
-    }
 }

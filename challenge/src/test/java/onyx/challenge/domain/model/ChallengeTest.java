@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 class ChallengeTest {
@@ -134,6 +135,47 @@ class ChallengeTest {
     }
 
     @Test
+    @DisplayName("챌린지가 비활성화된 경우 update 메서드 호출 시 IllegalStateException이 발생한다")
+    void whenChallengeIsInactive_thenUpdateThrowsException() {
+        // Given
+        Challenge challenge = Challenge.create(1L, 100L, "챌린지",
+                new Period(LocalDate.now(), LocalDate.now().plusDays(7)),
+                GoalContent.create("목표", "추가 내용", GoalType.POSITIVE),
+                Arrays.asList(10L, 11L));
+
+        // 챌린지를 비활성화 상태로 업데이트
+        Challenge inactiveChallenge = challenge.update(null, null, null, null, null, false);
+
+        // When & Then
+        Assertions.assertThatThrownBy(() -> inactiveChallenge.update("새 닉네임", null, null, null, null, true))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Challenge is not active");
+    }
+
+    @Test
+    @DisplayName("update 메서드에서 null 값을 전달하면 해당 필드는 기존 값이 유지된다")
+    void whenUpdatingWithNullValues_thenFieldsRemainUnchanged() {
+        // Given
+        String originalNickName = "챌린저";
+        Period originalPeriod = new Period(LocalDate.now(), LocalDate.now().plusDays(7));
+        GoalContent originalGoalContent = GoalContent.create("목표 내용", "추가 내용", GoalType.POSITIVE);
+        List<Long> originalAttachedImageIds = Arrays.asList(10L, 11L);
+
+        Challenge challenge = Challenge.create(1L, 100L, originalNickName, originalPeriod, originalGoalContent, originalAttachedImageIds);
+
+        // When
+        Challenge updatedChallenge = challenge.update(null, null, null, null, null, true);
+
+        // Then
+        Assertions.assertThat(updatedChallenge.getNickName()).isEqualTo(originalNickName);
+        Assertions.assertThat(updatedChallenge.getPeriod()).isEqualTo(originalPeriod);
+        Assertions.assertThat(updatedChallenge.getGoalContent()).isEqualTo(originalGoalContent);
+        Assertions.assertThat(updatedChallenge.getAttachedImageIds()).isEqualTo(originalAttachedImageIds);
+        Assertions.assertThat(updatedChallenge.getResult()).isEqualTo(challenge.getResult());
+        Assertions.assertThat(updatedChallenge.isActive()).isEqualTo(true);
+    }
+
+    @Test
     @DisplayName("ChallengeResult가 null이면 기본값으로 설정된다")
     void whenChallengeResultIsNull_thenSetToDefault() {
         // Given
@@ -153,4 +195,71 @@ class ChallengeTest {
         Assertions.assertThat(challenge.getResult().getStatus()).isEqualTo(ChallengeResultStatus.ON_GOING);
     }
 
+    @Test
+    @DisplayName("determineImagesToDelete 메서드는 유지해야 할 이미지 ID를 제외한 나머지 이미지 ID를 반환한다")
+    void whenDetermineImagesToDelete_thenReturnsCorrectImageIdsToDelete() {
+        // Given
+        List<Long> attachedImageIds = Arrays.asList(1L, 2L, 3L, 4L);
+        Challenge challenge = Challenge.create(1L, 100L, "챌린지", new Period(LocalDate.now(), LocalDate.now().plusDays(7)),
+                GoalContent.create("목표", "추가 내용", GoalType.POSITIVE), attachedImageIds);
+
+        List<Long> existingImageIds = Arrays.asList(2L, 3L); // 유지해야 할 이미지 ID
+
+        // When
+        List<Long> imageIdsToDelete = challenge.determineImagesToDelete(existingImageIds);
+
+        // Then
+        Assertions.assertThat(imageIdsToDelete).containsExactlyInAnyOrder(1L, 4L);
+    }
+
+    @Test
+    @DisplayName("determineImagesToDelete 메서드에서 모든 이미지를 유지해야 하면 빈 리스트를 반환한다")
+    void whenAllImagesToKeep_thenReturnsEmptyList() {
+        // Given
+        List<Long> attachedImageIds = Arrays.asList(1L, 2L, 3L);
+        Challenge challenge = Challenge.create(1L, 100L, "챌린지", new Period(LocalDate.now(), LocalDate.now().plusDays(7)),
+                GoalContent.create("목표", "추가 내용", GoalType.POSITIVE), attachedImageIds);
+
+        List<Long> existingImageIds = Arrays.asList(1L, 2L, 3L);
+
+        // When
+        List<Long> imageIdsToDelete = challenge.determineImagesToDelete(existingImageIds);
+
+        // Then
+        Assertions.assertThat(imageIdsToDelete).isEmpty();
+    }
+
+    @Test
+    @DisplayName("determineImagesToDelete 메서드에서 유지해야 할 이미지가 없으면 모든 이미지 ID를 반환한다")
+    void whenNoImagesToKeep_thenReturnsAllImageIds() {
+        // Given
+        List<Long> attachedImageIds = Arrays.asList(1L, 2L, 3L);
+        Challenge challenge = Challenge.create(1L, 100L, "챌린지", new Period(LocalDate.now(), LocalDate.now().plusDays(7)),
+                GoalContent.create("목표", "추가 내용", GoalType.POSITIVE), attachedImageIds);
+
+        List<Long> existingImageIds = Collections.emptyList();
+
+        // When
+        List<Long> imageIdsToDelete = challenge.determineImagesToDelete(existingImageIds);
+
+        // Then
+        Assertions.assertThat(imageIdsToDelete).containsExactlyInAnyOrderElementsOf(attachedImageIds);
+    }
+
+    @Test
+    @DisplayName("determineImagesToDelete 메서드에서 existingImageIds에 없는 이미지 ID가 포함되어도 올바르게 동작한다")
+    void whenExistingImageIdsContainInvalidIds_thenIgnoresInvalidIds() {
+        // Given
+        List<Long> attachedImageIds = Arrays.asList(1L, 2L, 3L);
+        Challenge challenge = Challenge.create(1L, 100L, "챌린지", new Period(LocalDate.now(), LocalDate.now().plusDays(7)),
+                GoalContent.create("목표", "추가 내용", GoalType.POSITIVE), attachedImageIds);
+
+        List<Long> existingImageIds = Arrays.asList(2L, 3L, 4L); // 4L은 존재하지 않는 이미지 ID
+
+        // When
+        List<Long> imageIdsToDelete = challenge.determineImagesToDelete(existingImageIds);
+
+        // Then
+        Assertions.assertThat(imageIdsToDelete).containsExactly(1L);
+    }
 }
