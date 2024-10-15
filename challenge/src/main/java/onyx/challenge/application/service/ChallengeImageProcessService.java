@@ -6,6 +6,7 @@ import onyx.challenge.application.port.outbound.ChallengeImageRepository;
 import onyx.challenge.application.port.outbound.FileStorage;
 import onyx.challenge.application.service.exceptiron.ChallengeImageNotFoundException;
 import onyx.challenge.domain.model.ChallengeImage;
+import onyx.challenge.domain.vo.ImageType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,7 @@ public class ChallengeImageProcessService {
     private final ChallengeImageRepository challengeImageRepository;
     private final FileStorage fileStorage;
 
-    public Long processImage(FileData fileData, int order, ChallengeImage.ImageType type) {
+    public Long processImage(FileData fileData, int order, ImageType type) {
         if (fileData == null) {
             throw new IllegalArgumentException("파일 데이터는 필수입니다.");
         }
