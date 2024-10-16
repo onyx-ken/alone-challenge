@@ -32,9 +32,10 @@ public class ChallengeImageJPAEntity {
     @Column(nullable = false)
     private String contentType; // MIME 타입
 
-    @Column(name = "image_order")
+    @Column(name = "image_order", nullable = false)
     private int order; // 이미지 순서
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ImageType imageType;
 
