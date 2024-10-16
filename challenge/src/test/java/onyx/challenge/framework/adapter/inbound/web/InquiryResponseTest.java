@@ -23,9 +23,10 @@ class InquiryResponseTest {
         String additionalContent = "Test additional content";
         String type = "POSITIVE";
         int likeCount = 22;
-        List<Long> attachedImageIds = Arrays.asList(100L, 101L, 102L);
+        int commentCount = 15;
+        Long attachedImageIs = 100L;
         ChallengeViewDTO dto = new ChallengeViewDTO(challengeId, nickName, startDate, endDate,
-                mainContent, additionalContent, type, likeCount, attachedImageIds);
+                mainContent, additionalContent, type, likeCount, commentCount, attachedImageIs);
 
         String imageBaseUrl = "https://example.com/images/";
 
@@ -43,64 +44,8 @@ class InquiryResponseTest {
         assertEquals(dto.getType(), response.getType());
         assertEquals(dto.getLikeCount(), response.getLikeCount());
 
-        List<String> expectedUrls = Arrays.asList(
-                imageBaseUrl + "100",
-                imageBaseUrl + "101",
-                imageBaseUrl + "102"
-        );
+        String expectedUrls = imageBaseUrl + "100";
         assertEquals(expectedUrls, response.getFirstAttachedImageUrl());
-    }
-
-    @Test
-    public void testCreate_withEmptyAttachedImages() {
-        // Given
-        Long challengeId = 1L;
-        String nickName = "Tester";
-        LocalDate startDate = LocalDate.of(2024, 10, 4);
-        LocalDate endDate = LocalDate.of(2024, 10, 10);
-        String mainContent = "Test main content";
-        String additionalContent = "Test additional content";
-        String type = "POSITIVE";
-        int likeCount = 22;
-        List<Long> attachedImageIds = Collections.emptyList();
-
-        ChallengeViewDTO dto = new ChallengeViewDTO(challengeId, nickName, startDate, endDate,
-                mainContent, additionalContent, type, likeCount, attachedImageIds);
-
-        String imageBaseUrl = "https://example.com/images/";
-
-        // When
-        InquiryResponse response = InquiryResponse.create(dto, imageBaseUrl);
-
-        // Then
-        assertNotNull(response);
-        assertEquals(Collections.emptyList(), response.getFirstAttachedImageUrl());
-    }
-
-    @Test
-    public void testCreate_withNullAttachedImages() {
-        // Given
-        Long challengeId = 1L;
-        String nickName = "Tester";
-        LocalDate startDate = LocalDate.of(2024, 10, 4);
-        LocalDate endDate = LocalDate.of(2024, 10, 10);
-        String mainContent = "Test main content";
-        String additionalContent = "Test additional content";
-        String type = "POSITIVE";
-        int likeCount = 22;
-        List<Long> attachedImageIds = null;
-        ChallengeViewDTO dto = new ChallengeViewDTO(challengeId, nickName, startDate, endDate,
-                mainContent, additionalContent, type, likeCount, attachedImageIds);
-
-        String imageBaseUrl = "https://example.com/images/";
-
-        // When
-        InquiryResponse response = InquiryResponse.create(dto, imageBaseUrl);
-
-        // Then
-        assertNotNull(response);
-        assertNotNull(response.getFirstAttachedImageUrl());
-        assertEquals(Collections.emptyList(), response.getFirstAttachedImageUrl());
     }
 
     @Test
@@ -114,9 +59,11 @@ class InquiryResponseTest {
         String additionalContent = "Test additional content";
         String type = "POSITIVE";
         int likeCount = 22;
+        int commentCount = 15;
+        Long attachedImageIs = 100L;
         List<Long> attachedImageIds = Arrays.asList(100L, 101L, 102L);
         ChallengeViewDTO dto = new ChallengeViewDTO(challengeId, nickName, startDate, endDate,
-                mainContent, additionalContent, type, likeCount, attachedImageIds);
+                mainContent, additionalContent, type, likeCount, commentCount, attachedImageIs);
 
         String imageBaseUrl = null; // imageBaseUrl이 null인 경우
 
