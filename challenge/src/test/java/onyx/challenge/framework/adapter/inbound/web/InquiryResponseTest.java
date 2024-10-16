@@ -48,7 +48,7 @@ class InquiryResponseTest {
                 imageBaseUrl + "101",
                 imageBaseUrl + "102"
         );
-        assertEquals(expectedUrls, response.getAttachedImagesUrl());
+        assertEquals(expectedUrls, response.getFirstAttachedImageUrl());
     }
 
     @Test
@@ -74,7 +74,7 @@ class InquiryResponseTest {
 
         // Then
         assertNotNull(response);
-        assertEquals(Collections.emptyList(), response.getAttachedImagesUrl());
+        assertEquals(Collections.emptyList(), response.getFirstAttachedImageUrl());
     }
 
     @Test
@@ -99,8 +99,8 @@ class InquiryResponseTest {
 
         // Then
         assertNotNull(response);
-        assertNotNull(response.getAttachedImagesUrl());
-        assertEquals(Collections.emptyList(), response.getAttachedImagesUrl());
+        assertNotNull(response.getFirstAttachedImageUrl());
+        assertEquals(Collections.emptyList(), response.getFirstAttachedImageUrl());
     }
 
     @Test

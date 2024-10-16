@@ -20,6 +20,13 @@ public class InquiryChallengeAdapter implements InquiryChallengeRepository {
 
     @Override
     public List<ChallengeViewDTO> getChallengeList() {
+        var firstImageSubquery = DSL.select(CHALLENGE_IMAGES.ID)
+                .from(CHALLENGE_IMAGES)
+                .join(CHALLENGE_ATTACHED_IMAGES).on(CHALLENGE_IMAGES.ID.eq(CHALLENGE_ATTACHED_IMAGES.ATTACHED_IMAGE_ID))
+                .where(CHALLENGE_ATTACHED_IMAGES.CHALLENGE_ID.eq(CHALLENGE.CHALLENGE_ID))
+                .and(CHALLENGE_IMAGES.IMAGE_ORDER.eq(1))
+                .asField("first_image_id");
+
         return dsl.select(
                         CHALLENGE.CHALLENGE_ID,
                         CHALLENGE.NICK_NAME,
@@ -28,16 +35,15 @@ public class InquiryChallengeAdapter implements InquiryChallengeRepository {
                         CHALLENGE.MAIN_CONTENT,
                         CHALLENGE.ADDITIONAL_CONTENT,
                         CHALLENGE.TYPE,
-                        DSL.count(LIKES.LIKE_ID).as("like_count"),
-                        DSL.arrayAgg(CHALLENGE_IMAGES.ID).as("attached_image_ids")
+                        DSL.countDistinct(LIKES.LIKE_ID).as("like_count"),
+                        DSL.countDistinct(COMMENTS.COMMENT_ID).as("comment_count"),
+                        firstImageSubquery
                 )
                 .from(CHALLENGE)
-                .leftJoin(CHALLENGE_ATTACHED_IMAGES)
-                    .on(CHALLENGE.CHALLENGE_ID.eq(CHALLENGE_ATTACHED_IMAGES.CHALLENGE_ID))
-                .leftJoin(CHALLENGE_IMAGES)
-                    .on(CHALLENGE_ATTACHED_IMAGES.ATTACHED_IMAGE_ID.eq(CHALLENGE_IMAGES.ID))
                 .leftJoin(LIKES)
                     .on(CHALLENGE.CHALLENGE_ID.eq(LIKES.CHALLENGE_ID))
+                .leftJoin(COMMENTS)
+                    .on(CHALLENGE.CHALLENGE_ID.eq(COMMENTS.CHALLENGE_ID))
                 .where(CHALLENGE.IS_ACTIVE.isTrue())
                 .groupBy(
                         CHALLENGE.CHALLENGE_ID,

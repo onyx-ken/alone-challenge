@@ -4,8 +4,6 @@ import lombok.Data;
 import onyx.challenge.application.dto.ChallengeViewDTO;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 @Data
@@ -19,25 +17,23 @@ public class InquiryResponse {
     private final String additionalContent;
     private final String type;
     private final int likeCount;
-    private final List<String> attachedImagesUrl;
+    private final int commentCount;
+    private final String firstAttachedImageUrl;
 
     public static InquiryResponse create(ChallengeViewDTO dto, String imageBaseUrl) {
         return new InquiryResponse(
                 dto.getChallengeId(), dto.getNickName(),
                 dto.getStartDate(), dto.getEndDate(),
                 dto.getMainContent(), dto.getAdditionalContent(),
-                dto.getType(), dto.getLikeCount(),
-                makeImagesUrl(dto.getAttachedImageIds(), imageBaseUrl));
+                dto.getType(), dto.getLikeCount(),dto.getCommentCount(),
+                makeImagesUrl(dto.getFirstImageId(), imageBaseUrl));
     }
 
-    private static List<String> makeImagesUrl(List<Long> attachedImageIds, String imageBaseUrl) {
+    private static String makeImagesUrl(Long attachedImageIds, String imageBaseUrl) {
         Objects.requireNonNull(imageBaseUrl, "imageBaseUrl must not be null");
-        if (attachedImageIds == null || attachedImageIds.isEmpty()) {
-            return Collections.emptyList();
+        if (attachedImageIds == null) {
+            throw new IllegalArgumentException("attachedImageIds must not be null");
         }
-
-        return attachedImageIds.stream()
-                .map(attachedImageId -> imageBaseUrl + attachedImageId)
-                .toList();
+        return imageBaseUrl + attachedImageIds;
     }
 }
