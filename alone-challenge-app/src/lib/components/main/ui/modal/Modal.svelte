@@ -2,11 +2,11 @@
     import { onMount, onDestroy } from 'svelte';
     import { createEventDispatcher } from 'svelte';
     import { format } from 'date-fns';
-    import ImageUpload from '$lib/components/main/ui/ImageUpload.svelte';
-    import ImageEdit from '$lib/components/main/ui/ImageEdit.svelte';
-    import ChallengeDetails from '$lib/components/main/ui/ChallengeDetails.svelte';
-    import ChallengeCertificate from '$lib/components/main/ui/ChallengeCertificate.svelte';
-    import BackgroundSelector from '$lib/components/main/ui/BackgroundSelector.svelte';
+    import ImageUpload from '$lib/components/main/ui/modal/steps/ImageUpload.svelte';
+    import ImageEdit from '$lib/components/main/ui/modal/steps/ImageEdit.svelte';
+    import ChallengeDetails from '$lib/components/main/ui/modal/steps/ChallengeDetails.svelte';
+    import ChallengeCertificate from '$lib/components/main/ui/modal/steps/ChallengeCertificate.svelte';
+    import BackgroundSelector from '$lib/components/main/ui/modal/steps/BackgroundSelector.svelte';
 
     const dispatch = createEventDispatcher();
     export let onClose = () => {};

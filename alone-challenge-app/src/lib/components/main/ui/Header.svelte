@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { isLoggedIn, checkLoginStatus } from '$lib/stores/session';
-    import Modal from "$lib/components/main/ui/Modal.svelte";
+    import Modal from "$lib/components/main/ui/modal/Modal.svelte";
     import SunIcon from "$lib/components/icon/SunIcon.svelte";
     import MoonIcon from "$lib/components/icon/MoonIcon.svelte";
     import ProfileIcon from "$lib/components/icon/ProfileIcon.svelte";
