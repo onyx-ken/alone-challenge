@@ -1,22 +1,61 @@
+<svelte:options accessors/>
 <script>
+    import { onMount, onDestroy } from 'svelte';
     import Flatpickr from "flatpickr";
     import "flatpickr/dist/themes/airbnb.css";
     import { Korean } from "flatpickr/dist/l10n/ko.js";
     import { format } from 'date-fns';
-    import { onMount } from 'svelte';
+    import { initUserInfo, userStore } from "$lib/stores/userStore.js";
 
     export let onDetailsSave = () => {};
 
-    let dateRange = { from: new Date(), to: new Date(new Date().setDate(new Date().getDate() + 7)) };
-    let challengeType = '';
-    let challengeCategory = '';
-    let challengeTarget = '';  // 사용자가 입력할 도전 대상
-    let nickname = "xxx";  // 추후 백엔드에서 불러올 닉네임
+    export let dateRange = { from: new Date(), to: new Date(new Date().setDate(new Date().getDate() + 7)) };
+    export let challengeType = '';
+    export let challengeCategory = null;
+    export let challengeTarget = '';  // 사용자가 입력할 도전 대상
+    export let nickName = '';
     let flatpickrInput;
     let flatpickrInstance;
 
-    const positiveCategories = ['하겠습니다', '먹겠습니다', '마시겠습니다', '보겠습니다'];
-    const negativeCategories = ['하지 않겠습니다', '먹지 않겠습니다', '마시지 않겠습니다', '보지 않겠습니다'];
+
+    // userStore에서 사용자 정보 가져오기
+    let unsubscribe;
+
+    onMount(() => {
+        initUserInfo()
+        unsubscribe = userStore.subscribe(userData => {
+            if (userData) {
+                ({nickName} = userData);
+            } else {
+                console.error('사용자 정보가 없습니다.');
+            }
+        });
+    });
+
+    // 컴포넌트 언마운트 시 구독 해제
+    onDestroy(() => {
+        if (unsubscribe) {
+            unsubscribe();
+        }
+    });
+
+    const selectChallengeCategory = (category) => {
+        challengeCategory = category;
+    };
+
+    const positiveCategories = [
+        { action: '하기', ending: '하겠습니다' },
+        { action: '먹기', ending: '먹겠습니다' },
+        { action: '마시기', ending: '마시겠습니다' },
+        { action: '보기', ending: '보겠습니다' },
+    ];
+
+    const negativeCategories = [
+        { action: '하지 않기', ending: '하지 않겠습니다' },
+        { action: '먹지 않기', ending: '먹지 않겠습니다' },
+        { action: '마시지 않기', ending: '마시지 않겠습니다' },
+        { action: '보지 않기', ending: '보지 않겠습니다' },
+    ];
 
     const formatDate = (date) => {
         return format(date, 'yyyy.MM.dd');
@@ -72,7 +111,7 @@
         }
     }
 
-    $: challengeSummary = `나 ${nickname}는 ${formatDate(dateRange.from)}부터 ${formatDate(dateRange.to)}까지 `;
+    $: challengeSummary = `나 ${nickName}은(는) ${formatDate(dateRange.from)}부터 ${formatDate(dateRange.to)}까지`;
 
     // 실시간 요약 표시 여부 결정
     $: showChallengeSummary = dateRange.from && dateRange.to && challengeType && challengeCategory;
@@ -106,6 +145,7 @@
         </button>
     </div>
 
+
     <!-- 선택된 도전 유형에 따른 카테고리 선택 -->
     {#if challengeType === 'positive'}
         <div class="mt-4">
@@ -114,8 +154,9 @@
                 {#each positiveCategories as category}
                     <button
                             class="btn w-full {challengeCategory === category ? 'btn-primary' : 'btn-outline'}"
-                            on:click={() => challengeCategory = category}>
-                        {category}
+                            on:click={() => selectChallengeCategory(category)}
+                    >
+                        {category.ending}
                     </button>
                 {/each}
             </div>
@@ -127,8 +168,9 @@
                 {#each negativeCategories as category}
                     <button
                             class="btn w-full {challengeCategory === category ? 'btn-primary' : 'btn-outline'}"
-                            on:click={() => challengeCategory = category}>
-                        {category}
+                            on:click={() => selectChallengeCategory(category)}
+                    >
+                        {category.ending}
                     </button>
                 {/each}
             </div>
@@ -141,7 +183,7 @@
             <p>
                 {challengeSummary}
                 <input type="text" class="input input-bordered inline w-1/4" bind:value={challengeTarget} placeholder="[무엇을]"/>
-                {challengeCategory ? `${challengeCategory}.` : '--------'}
+                {challengeCategory ? `${challengeCategory.ending}.` : '--------'}
             </p>
         </div>
     {/if}

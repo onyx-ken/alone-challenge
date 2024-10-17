@@ -1,7 +1,7 @@
 <script>
     import FistIcon from "$lib/components/icon/FistIcon.svelte";
 
-    export let nickname = "홍길동";
+    export let nickName = "홍길동";
     export let startDate = "2024-09-01";
     export let endDate = "2024-09-30";
     export let challengeDescription = "매일 아침 6시에 기상 하겠습니다";
@@ -27,7 +27,7 @@
             <FistIcon />
         </div>
         <div class="mb-4">
-            <h2 class="text-4xl font-semibold">{nickname}</h2>
+            <h2 class="text-4xl font-semibold">{nickName}</h2>
         </div>
         <div class="mb-4">
             <p class="text-lg font-semibold">"{challengeDescription}"</p>

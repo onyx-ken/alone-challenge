@@ -4,7 +4,7 @@
     import GoogleIcon from "$lib/components/icon/GoogleIcon.svelte";
     import FaceBookIcon from "$lib/components/icon/FaceBookIcon.svelte";
     import { getApiEndpoints } from '$lib/apiEndpoints';
-    import { userStore, fetchUserInfo } from '$lib/stores/userStore';
+    import { userStore, fetchUserInfo, initUserInfo } from '$lib/stores/userStore';
 
     let nickName = "JohnDoe";
     let bio = "I'm passionate about setting and achieving goals!";
@@ -22,6 +22,7 @@
     let unsubscribe;
 
     onMount(() => {
+        initUserInfo()
         unsubscribe = userStore.subscribe(userData => {
             if (userData) {
                 ({nickName, bio, points, email, provider, profileImageId} = userData);

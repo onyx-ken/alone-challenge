@@ -1,6 +1,7 @@
 <script>
     import { onMount, onDestroy } from 'svelte';
     import { createEventDispatcher } from 'svelte';
+    import { format } from 'date-fns';
     import ImageUpload from '$lib/components/main/ui/ImageUpload.svelte';
     import ImageEdit from '$lib/components/main/ui/ImageEdit.svelte';
     import ChallengeDetails from '$lib/components/main/ui/ChallengeDetails.svelte';
@@ -10,6 +11,9 @@
     const dispatch = createEventDispatcher();
     export let onClose = () => {};
 
+    // ChallengeDetails 컴포넌트 인스턴스를 저장할 변수
+    let challengeDetailsComponent;
+
     // Step 상수를 객체로 정의
     const Step = {
         UPLOAD: 1,
@@ -18,11 +22,25 @@
         PREVIEW: 4
     };
 
+    // 도전 관련 상태 관리
+    let challengeData = {
+        nickName: '',          // 사용자 닉네임
+        startDate: '',         // 시작 날짜
+        endDate: '',           // 종료 날짜
+        challengeDescription: '' // 도전 내용
+    };
+
     let step = Step.UPLOAD;  // 초기값을 상수로 설정
     let uploadedImages = [];
     let selectedImageData = {};
     let selectedBackground = "/background1.png"; // 기본 배경 이미지
     let userText = ""; // 사용자 입력 글
+
+    const handleDetailsSave = (event) => {
+        // `ChallengeDetails` 컴포넌트에서 전달된 데이터를 `challengeData`에 저장
+        challengeData = { ...challengeData, ...event.detail };
+        step = Step.PREVIEW; // 다음 단계로 이동
+    };
 
     const handleKeydown = (event) => {
         if (event.key === 'Escape') {
@@ -51,7 +69,53 @@
         step = Step.DETAILS;
     }
 
+    const formatDate = (date) => {
+        return format(date, 'yyyy.MM.dd');
+    };
+
+    const validateChallengeDetails = () => {
+        // 자식 컴포넌트의 데이터를 가져옵니다.
+        const {
+            dateRange,
+            challengeType,
+            challengeCategory,
+            challengeTarget,
+            nickName
+        } = challengeDetailsComponent;
+
+        // 필수 필드가 모두 입력되었는지 확인합니다.
+        if (!dateRange || !challengeType || !challengeCategory || !challengeTarget) {
+            return false;
+        }
+
+        // 도전 설명 생성
+        const challengeDescription = `${challengeTarget} ${challengeCategory.ending}`;
+
+        // 도전 데이터를 업데이트합니다.
+        challengeData = {
+            nickName,
+            startDate: formatDate(dateRange.from),
+            endDate: formatDate(dateRange.to),
+            challengeDescription
+        };
+
+        return true;
+    };
+
+
     const handleNextClick = () => {
+        if (step === Step.DETAILS) {
+            // 자식 컴포넌트의 데이터를 가져옵니다.
+            if (validateChallengeDetails()) {
+                // 데이터 유효성 검사를 통과하면 다음 단계로 이동
+                step = Step.PREVIEW;
+            } else {
+                // 유효성 검사 실패 시 알림
+                alert('모든 필드를 올바르게 입력해주세요.');
+            }
+            return;
+        }
+
         if (step === Step.UPLOAD && uploadedImages.length === 0) {
             step = Step.DETAILS;  // 이미지를 업로드하지 않은 경우, 바로 도전내용 작성으로 이동
             return;
@@ -125,7 +189,9 @@
             />
         {:else if step === Step.DETAILS}
             <!-- 3단계: 도전 내용 작성 -->
-            <ChallengeDetails />
+            <ChallengeDetails
+                    bind:this={challengeDetailsComponent}
+            />
         {/if}
 
         <!-- 4단계: 도전 공유 (도전장 미리보기, 배경 선택, 글 작성) -->
@@ -135,7 +201,13 @@
                 <div class="w-2/3">
                     <h3 class="font-bold text-lg mb-4"> 미리보기</h3>
                     <div class="certificate-preview">
-                        <ChallengeCertificate background={selectedBackground} />
+                        <ChallengeCertificate
+                                nickName={challengeData.nickName}
+                                startDate={challengeData.startDate}
+                                endDate={challengeData.endDate}
+                                challengeDescription={challengeData.challengeDescription}
+                                background={selectedBackground}
+                        />
                     </div>
                 </div>
 
