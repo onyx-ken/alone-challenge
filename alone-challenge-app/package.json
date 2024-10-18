@@ -31,7 +31,8 @@
 	"dependencies": {
 		"date-fns": "^3.6.0",
 		"flatpickr": "^4.6.13",
-		"svelte-dnd-action": "^0.9.50",
-		"svelte-easy-crop": "^3.0.0"
+		"svelte-dnd-action": "^0.9.51",
+		"svelte-easy-crop": "^3.0.0",
+		"uuid": "^10.0.0"
 	}
 }

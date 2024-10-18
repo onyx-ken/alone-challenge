@@ -2,6 +2,7 @@
     import { onMount, onDestroy } from 'svelte';
     import { createEventDispatcher } from 'svelte';
     import { format } from 'date-fns';
+    import { v4 as uuidv4 } from 'uuid';
     import ImageUpload from '$lib/components/main/ui/modal/steps/ImageUpload.svelte';
     import ImageEdit from '$lib/components/main/ui/modal/steps/ImageEdit.svelte';
     import ChallengeDetails from '$lib/components/main/ui/modal/steps/ChallengeDetails.svelte';
@@ -51,15 +52,17 @@
     const handleImageUpload = (event) => {
         const files = event.detail;
         if (Array.isArray(files) && files.length > 0) {
-            uploadedImages = files.map(file => ({
+            // 각 파일에 고유한 id를 부여합니다.
+            uploadedImages = files.map((file) => ({
+                id: uuidv4(), // UUID 고유한 값 사용
                 file,
                 preview: URL.createObjectURL(file)
             }));
-            step = Step.CROP;  // 2단계: 이미지 자르기 단계로 이동
+            step = Step.CROP;  // 2단계로 이동
         } else {
             console.error("handleImageUpload: Expected an array, but got", typeof files);
         }
-    }
+    };
 
     const handleCropComplete = (croppedAreaPixels) => {
         selectedImageData = croppedAreaPixels;
@@ -153,6 +156,10 @@
         dispatch('select', selectedBackground); // Svelte의 dispatch 함수를 사용해 이벤트 전달
     }
 
+    const handleImagesUpdate = (updatedImages) => {
+        uploadedImages = updatedImages;
+    };
+
     onMount(() => {
         window.addEventListener('keydown', handleKeydown);
         return () => {
@@ -184,6 +191,7 @@
             <!-- 2단계: 이미지 자르기 -->
             <ImageEdit
                     images={uploadedImages}
+                    onImagesUpdate={handleImagesUpdate}
                     onSave={handleImageEdit}
                     onCropComplete={handleCropComplete}
             />
