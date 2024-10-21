@@ -3,56 +3,84 @@
     import { onMount } from 'svelte';
     import { dndzone } from 'svelte-dnd-action';
     import { flip } from 'svelte/animate';
+    import LeftArrowIcon from "$lib/components/icon/LeftArrowIcon.svelte";
+    import RightArrowIcon from "$lib/components/icon/RightArrowIcon.svelte";
+    import ZoomOutIcon from "$lib/components/icon/ZoomOutIcon.svelte";
+    import ZoomInIcon from "$lib/components/icon/ZoomInIcon.svelte";
+    import FoldersIcon from "$lib/components/icon/FoldersIcon.svelte";
 
     export let images = []; // 부모로부터 전달받은 이미지 배열
     export let onImagesUpdate = () => {}; // 부모에게 변경된 이미지를 전달하기 위한 콜백 함수
     export let onCropComplete = () => {};
-    export let onSave = () => {}; // 저장 버튼 클릭 시 호출될 함수
 
+    // 로컬 상태로 관리할 이미지 배열
+    let localImages = [];
 
-    let localImages = [...images]; // 로컬 상태로 관리할 이미지 배열
-
-    let crop = { x: 0, y: 0 };
     let aspect = 1;
-    let zoomLevels = [];
-    let croppedAreaPixels = [];
     let selectedImageIndex = 0; // 자를 이미지를 선택할 인덱스
-    let isTransitioning = false;
 
     // 썸네일 모달 표시 여부
     let showThumbnailModal = false;
 
     onMount(() => {
-        // 이미지가 변경될 때마다 zoomLevels를 초기화합니다.
-        zoomLevels = localImages.map(() => 1);
+        // 이미지 객체에 자르기 정보 추가
+        localImages = images.map(image => ({
+            ...image,
+            crop: { x: 0, y: 0 },
+            zoom: 1,
+            croppedAreaPixels: null
+        }));
     });
 
+    // 반응형 문법을 사용하여 selectedImageIndex의 유효성 보장
+    $: {
+        if (selectedImageIndex < 0) {
+            selectedImageIndex = 0;
+        } else if (selectedImageIndex >= localImages.length) {
+            selectedImageIndex = localImages.length - 1;
+        }
+    }
+
+    $: if (images.length !== localImages.length) {
+        localImages = images.map(image => ({
+            ...image,
+            crop: image.crop || { x: 0, y: 0 },
+            zoom: image.zoom || 1,
+            croppedAreaPixels: image.croppedAreaPixels || null
+        }));
+    }
+
     const handleCropComplete = (croppedAreaPixelsResult) => {
-        croppedAreaPixels[selectedImageIndex] = croppedAreaPixelsResult;
-        onCropComplete(croppedAreaPixels);
+        if (localImages[selectedImageIndex]) {
+            localImages[selectedImageIndex].croppedAreaPixels = croppedAreaPixelsResult;
+            onCropComplete(localImages.map(img => img.croppedAreaPixels));
+        }
     };
 
     function selectNextImage() {
-        if (selectedImageIndex >= images.length - 1) return;
-
+        if (selectedImageIndex >= localImages.length - 1) {
+            return;
+        }
         selectedImageIndex++;
-        resetCropState();
     }
 
     function selectPreviousImage() {
-        if (selectedImageIndex <= 0) return;
-
+        if (selectedImageIndex <= 0) {
+            return;
+        }
         selectedImageIndex--;
-        resetCropState();
     }
 
     const resetCropState = () => {
-        crop = { x: 0, y: 0 }; // crop.set({...}) 대신 재할당
+        if (localImages[selectedImageIndex]) {
+            localImages[selectedImageIndex].crop = { x: 0, y: 0 };
+            localImages = [...localImages]; // 반응성 유지
+        }
     };
 
     const setAspect = (ratio) => {
-        aspect = ratio || null; // aspect.set(...) 대신 재할당
-        crop = { x: 0, y: 0 }; // crop.set({...}) 대신 재할당
+        aspect = ratio || null;
+        resetCropState();
     };
 
     const toggleThumbnailModal = () => {
@@ -66,30 +94,30 @@
     function handleDndFinalize(e) {
         localImages = e.detail.items;
 
-        // 추가적인 상태 업데이트는 여기서 수행합니다.
         // 부모에게 변경된 이미지 배열을 전달합니다.
         onImagesUpdate(localImages);
 
         // selectedImageIndex 업데이트
+        const oldSelectedImageId = localImages[selectedImageIndex]?.id;
         selectedImageIndex = localImages.findIndex(
-            (img) => img.id === localImages[selectedImageIndex]?.id
+            (img) => img.id === oldSelectedImageId
         );
-
-        // zoomLevels와 croppedAreaPixels의 순서도 함께 변경합니다.
-        zoomLevels = localImages.map((_, idx) => zoomLevels[idx] || 1);
-        croppedAreaPixels = localImages.map((_, idx) => croppedAreaPixels[idx] || null);
     }
 
     const increaseZoom = () => {
-        zoomLevels[selectedImageIndex] = Math.min(zoomLevels[selectedImageIndex] + 0.1, 3);
-        zoomLevels = [...zoomLevels]; // 배열을 재할당하여 반응성 유지
+        if (localImages[selectedImageIndex]) {
+            localImages[selectedImageIndex].zoom = Math.min(localImages[selectedImageIndex].zoom + 0.1, 3);
+            localImages = [...localImages]; // 반응성 유지
+        }
     };
 
     const decreaseZoom = () => {
-        zoomLevels[selectedImageIndex] = Math.max(zoomLevels[selectedImageIndex] - 0.1, 1);
-        zoomLevels = [...zoomLevels]; // 배열을 재할당하여 반응성 유지
+        if (localImages[selectedImageIndex]) {
+            localImages[selectedImageIndex].zoom = Math.max(localImages[selectedImageIndex].zoom - 0.1, 1);
+            localImages = [...localImages]; // 반응성 유지
+            console.log('Zoom decreased for image:', localImages[selectedImageIndex]?.id, 'New zoom:', localImages[selectedImageIndex].zoom);
+        }
     };
-
 </script>
 
 <style>
@@ -169,29 +197,36 @@
     :global(.cropper) {
         width: 100%;
         height: 100%;
+        z-index: 1; /* 낮은 z-index 설정 */
+    }
+
+    .arrow-button {
+        z-index: 20 !important; /* 높은 z-index 설정 */
     }
 </style>
 
 <div class="cropper-container">
-    <Cropper
-            class="cropper"
-            image={localImages[selectedImageIndex]?.preview}
-            bind:crop={crop}
-            bind:zoom={zoomLevels[selectedImageIndex]}
-            bind:aspect={aspect}
-            on:cropcomplete={handleCropComplete}
-            background={false}
-            style={{
-                    cropAreaStyle: {
-                        backgroundColor: 'transparent',
-                    },
-                    mediaStyle: {
-                        objectFit: 'cover',
-                        width: '100%',
-                        height: '100%',
-                    },
+    {#if localImages[selectedImageIndex]}
+        <Cropper
+                class="cropper"
+                image={localImages[selectedImageIndex].preview}
+                bind:crop={localImages[selectedImageIndex].crop}
+                bind:zoom={localImages[selectedImageIndex].zoom}
+                bind:aspect={aspect}
+                on:cropcomplete={handleCropComplete}
+                background={false}
+                style={{
+                cropAreaStyle: {
+                    backgroundColor: 'transparent',
+                },
+                mediaStyle: {
+                    objectFit: 'cover',
+                    width: '100%',
+                    height: '100%',
+                },
             }}
-    />
+        />
+    {/if}
 
     <!-- 왼쪽 하단 컨트롤 -->
     <div class="controls">
@@ -208,47 +243,43 @@
 
         <!-- 줌 컨트롤 아이콘들 -->
         <button class="btn btn-circle btn-sm" on:click={decreaseZoom}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM13.5 10.5h-6" />
-            </svg>
+            <ZoomOutIcon />
         </button>
         <button class="btn btn-circle btn-sm" on:click={increaseZoom}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607ZM10.5 7.5v6m3-3h-6" />
-            </svg>
+            <ZoomInIcon />
         </button>
     </div>
 
-    <!-- 오른쪽 하단 썸네일 버튼 -->
     <div class="thumbnail-button">
         <button class="btn btn-circle btn-sm" on:click={toggleThumbnailModal}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" />
-            </svg>
+            <FoldersIcon />
         </button>
     </div>
+
     <!-- 왼쪽 화살표 버튼 (첫 번째 이미지에서는 숨김) -->
     {#if selectedImageIndex > 0}
-        <button class="absolute left-6 top-1/2 transform -translate-y-1/2 btn btn-circle btn-outline" on:click={selectPreviousImage}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
+        <button
+                class="absolute left-6 top-1/2 transform -translate-y-1/2 btn btn-circle btn-outline arrow-button"
+                on:click={selectPreviousImage}
+        >
+            <LeftArrowIcon />
         </button>
     {/if}
 
     <!-- 오른쪽 화살표 버튼 (마지막 이미지에서는 숨김) -->
-    {#if selectedImageIndex < images.length - 1}
-        <button class="absolute right-6 top-1/2 transform -translate-y-1/2 btn btn-circle btn-outline" on:click={selectNextImage}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
+    {#if selectedImageIndex < localImages.length - 1}
+        <button
+                class="absolute right-6 top-1/2 transform -translate-y-1/2 btn btn-circle btn-outline arrow-button"
+                on:click={selectNextImage}
+        >
+            <RightArrowIcon />
         </button>
     {/if}
 </div>
 
 <!-- 이미지 개수 표시 -->
 <div class="flex justify-center mt-2 space-x-2">
-    {#each images as _, index}
+    {#each localImages as _, index}
         <div class="w-3 h-3 rounded-full {index === selectedImageIndex ? 'bg-blue-500' : 'bg-gray-400'}"></div>
     {/each}
 </div>
@@ -269,9 +300,9 @@
                         class="thumbnail-item {image.id === localImages[selectedImageIndex].id ? 'selected' : ''}"
                         animate:flip={{ duration: 300 }}
                         on:click={() => {
-                                        selectedImageIndex = localImages.findIndex((img) => img.id === image.id);
-                                        showThumbnailModal = false;
-                }}
+                        selectedImageIndex = localImages.findIndex((img) => img.id === image.id);
+                        showThumbnailModal = false;
+                    }}
                 >
                     <img src={image.preview} alt="Thumbnail" />
                 </div>

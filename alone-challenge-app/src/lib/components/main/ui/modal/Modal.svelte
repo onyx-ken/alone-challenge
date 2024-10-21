@@ -37,12 +37,6 @@
     let selectedBackground = "/background1.png"; // 기본 배경 이미지
     let userText = ""; // 사용자 입력 글
 
-    const handleDetailsSave = (event) => {
-        // `ChallengeDetails` 컴포넌트에서 전달된 데이터를 `challengeData`에 저장
-        challengeData = { ...challengeData, ...event.detail };
-        step = Step.PREVIEW; // 다음 단계로 이동
-    };
-
     const handleKeydown = (event) => {
         if (event.key === 'Escape') {
             onClose();
@@ -160,6 +154,82 @@
         uploadedImages = updatedImages;
     };
 
+    // 추가된 변수: 대표 이미지 설정 체크박스 상태
+    let setAsRepresentativeImage = false; // 기본값: false
+
+    // 현재 선택된 이미지 인덱스 추적
+    let selectedImageIndex = 0;
+
+    // 체크박스 변경 핸들러
+    const handleRepresentativeToggle = (event) => {
+        setAsRepresentativeImage = event.target.checked;
+        if (uploadedImages.length === 0) return;
+        const selectedImage = uploadedImages[selectedImageIndex];
+        if (!selectedImage) return;
+
+        if (setAsRepresentativeImage) {
+            if (selectedImageIndex !== 0) {
+                // 선택된 이미지를 첫 번째로 이동
+                uploadedImages = [selectedImage, ...uploadedImages.filter(img => img.id !== selectedImage.id)];
+                selectedImageIndex = 0;
+            }
+        } else {
+            if (selectedImageIndex !== uploadedImages.length -1) {
+                // 선택된 이미지를 마지막으로 이동
+                uploadedImages = [...uploadedImages.filter(img => img.id !== selectedImage.id), selectedImage];
+                selectedImageIndex = uploadedImages.length -1;
+            }
+        }
+    };
+
+    const handleShare = () => {
+        // 첨부파일이 없으면, 자동으로 대표 이미지를 설정
+        let finalImages = [...uploadedImages];
+        if (finalImages.length === 0) {
+            // 첨부파일이 없을 때는 대표 이미지가 없으므로 별도의 처리가 필요 없다면 빈 배열을 보낼 수 있습니다.
+            finalImages = [];
+        } else {
+            // 이미 첨부파일이 있는 경우, 이미 순서가 정해져 있으므로 그대로 전송
+            // 대표 이미지를 첫 번째로 설정했으므로 추가 작업 필요 없음
+        }
+
+        // 백엔드로 전송할 데이터 구성
+        const payload = {
+            challengeData,
+            background: selectedBackground,
+            userText,
+            images: finalImages.map((img, index) => ({
+                id: img.id,
+                // 실제로는 파일을 전송하는 방법에 따라 다를 수 있습니다.
+                // 예: 파일 업로드를 위한 FormData 사용 또는 파일 URL 전송 등
+                // 여기서는 간단히 파일 이름과 순서만 전송한다고 가정
+                fileName: img.file.name,
+                order: index + 1 // 순서 번호 부여 (1부터 시작)
+            }))
+        };
+
+        // 예시: Fetch API를 사용한 백엔드 전송
+        fetch('/api/share-challenge', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('도전장이 성공적으로 공유되었습니다!');
+                    onClose();
+                } else {
+                    alert('도전장 공유에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error sharing challenge:', error);
+                alert('도전장 공유 중 오류가 발생했습니다.');
+            });
+    };
+
     onMount(() => {
         window.addEventListener('keydown', handleKeydown);
         return () => {
@@ -229,6 +299,15 @@
                               placeholder="도전에 대한 글을 작성하세요 (최대 1000자)"
                               maxlength="1000"
                               bind:value={userText}></textarea>
+                    <!-- 체크박스: 도전장 이미지를 대표이미지로 설정 -->
+                    {#if uploadedImages.length > 0}
+                        <div class="form-control mt-4">
+                            <label class="label cursor-pointer">
+                                <input type="checkbox" class="checkbox" bind:checked={setAsRepresentativeImage} on:change={handleRepresentativeToggle} />
+                                <span class="label-text font-bold">도전장을 대표이미지로 설정</span>
+                            </label>
+                        </div>
+                    {/if}
                 </div>
             </div>
         {/if}
@@ -252,7 +331,7 @@
 
             {#if step === Step.PREVIEW}
                 <button class="btn btn-outline" on:click={handlePreviousClick}>이전</button>
-                <button class="btn btn-primary ml-auto">공유하기</button>
+                <button class="btn btn-primary ml-auto" on:click={handleShare}>공유하기</button>
             {/if}
         </div>
     </div>
