@@ -3,17 +3,28 @@
     import { createEventDispatcher } from 'svelte';
     import { format } from 'date-fns';
     import { v4 as uuidv4 } from 'uuid';
+    import { getApiEndpoints } from '$lib/apiEndpoints';
     import ImageUpload from '$lib/components/main/ui/modal/steps/ImageUpload.svelte';
     import ImageEdit from '$lib/components/main/ui/modal/steps/ImageEdit.svelte';
     import ChallengeDetails from '$lib/components/main/ui/modal/steps/ChallengeDetails.svelte';
     import ChallengeCertificate from '$lib/components/main/ui/modal/steps/ChallengeCertificate.svelte';
     import BackgroundSelector from '$lib/components/main/ui/modal/steps/BackgroundSelector.svelte';
+    const accessToken = localStorage.getItem('accessToken');
 
+
+    const { CHALLENGE } = getApiEndpoints();
     const dispatch = createEventDispatcher();
     export let onClose = () => {};
 
     // ChallengeDetails 컴포넌트 인스턴스를 저장할 변수
     let challengeDetailsComponent;
+
+    onMount(() => {
+        window.addEventListener('keydown', handleKeydown);
+        return () => {
+            window.removeEventListener('keydown', handleKeydown);
+        };
+    });
 
     // Step 상수를 객체로 정의
     const Step = {
@@ -91,8 +102,8 @@
         // 도전 데이터를 업데이트합니다.
         challengeData = {
             nickName,
-            startDate: formatDate(dateRange.from),
-            endDate: formatDate(dateRange.to),
+            startDate: format(dateRange.from, 'yyyy-MM-dd'), // 백엔드와 호환되는 형식으로 변경
+            endDate: format(dateRange.to, 'yyyy-MM-dd'),
             challengeDescription
         };
 
@@ -182,60 +193,87 @@
         }
     };
 
-    const handleShare = () => {
-        // 첨부파일이 없으면, 자동으로 대표 이미지를 설정
-        let finalImages = [...uploadedImages];
-        if (finalImages.length === 0) {
-            // 첨부파일이 없을 때는 대표 이미지가 없으므로 별도의 처리가 필요 없다면 빈 배열을 보낼 수 있습니다.
-            finalImages = [];
-        } else {
-            // 이미 첨부파일이 있는 경우, 이미 순서가 정해져 있으므로 그대로 전송
-            // 대표 이미지를 첫 번째로 설정했으므로 추가 작업 필요 없음
-        }
+    const handleShare = async () => {
+        try {
 
-        // 백엔드로 전송할 데이터 구성
-        const payload = {
-            challengeData,
-            background: selectedBackground,
-            userText,
-            images: finalImages.map((img, index) => ({
-                id: img.id,
-                // 실제로는 파일을 전송하는 방법에 따라 다를 수 있습니다.
-                // 예: 파일 업로드를 위한 FormData 사용 또는 파일 URL 전송 등
-                // 여기서는 간단히 파일 이름과 순서만 전송한다고 가정
-                fileName: img.file.name,
-                order: index + 1 // 순서 번호 부여 (1부터 시작)
-            }))
-        };
 
-        // 예시: Fetch API를 사용한 백엔드 전송
-        fetch('/api/share-challenge', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        })
-            .then(response => {
-                if (response.ok) {
-                    alert('도전장이 성공적으로 공유되었습니다!');
-                    onClose();
+            // 이미지 배열 준비
+            let imagesToUpload = [];
+
+            if (uploadedImages.length === 0) {
+
+            } else {
+                if (setAsRepresentativeImage) {
+
+
+                    uploadedImages.forEach((img, index) => {
+                        imagesToUpload.push({
+                            file: img.file,
+                            order: index + 1,
+                            type: 'USER_UPLOAD'
+                        });
+                    });
                 } else {
-                    alert('도전장 공유에 실패했습니다.');
-                }
-            })
-            .catch(error => {
-                console.error('Error sharing challenge:', error);
-                alert('도전장 공유 중 오류가 발생했습니다.');
-            });
-    };
+                    // 도전장 이미지를 대표이미지로 설정하지 않은 경우
+                    uploadedImages.forEach((img, index) => {
+                        imagesToUpload.push({
+                            file: img.file,
+                            order: index,
+                            type: 'USER_UPLOAD'
+                        });
+                    });
 
-    onMount(() => {
-        window.addEventListener('keydown', handleKeydown);
-        return () => {
-            window.removeEventListener('keydown', handleKeydown);
-        };
-    });
+                }
+            }
+
+            // FormData 객체 생성
+            const formData = new FormData();
+
+            formData.append('nickName', challengeData.nickName);
+            formData.append('startDate', challengeData.startDate);
+            formData.append('endDate', challengeData.endDate);
+            formData.append('mainContent', challengeData.challengeDescription);
+            formData.append('additionalContent', userText);
+            // todo 현재는 미완성 되어서 하드코딩으로 처리, 나중에 값 받아와서 처리
+            formData.append('goalType', 'POSITIVE'); // 'POSITIVE' 또는 'NEGATIVE'
+
+            imagesToUpload.forEach((imageData, index) => {
+                formData.append(`images[${index}].file`, imageData.file);
+                formData.append(`images[${index}].order`, imageData.order.toString());
+                formData.append(`images[${index}].type`, imageData.type);
+            });
+
+            const isLocal = window.location.hostname === 'localhost';
+
+            const headers = {
+                'Authorization': `Bearer ${accessToken}`,
+            };
+
+            if (isLocal) {
+                headers['X-User-Id'] = 1;
+            }
+
+            // 백엔드로 전송
+            const response = await fetch(`${CHALLENGE}/challenges`, {
+                headers,
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                alert('도전장이 성공적으로 공유되었습니다!');
+                onClose();
+            } else {
+                const errorText = await response.text();
+                console.error('Server error:', errorText);
+                alert('도전장 공유에 실패했습니다.');
+            }
+
+        } catch (error) {
+            console.error('Error sharing challenge:', error);
+            alert('도전장 공유 중 오류가 발생했습니다.');
+        }
+    };
 
     onDestroy(() => {
         window.removeEventListener('keydown', handleKeydown);

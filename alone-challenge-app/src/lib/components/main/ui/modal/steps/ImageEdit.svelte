@@ -1,6 +1,6 @@
 <script>
     import Cropper from 'svelte-easy-crop';
-    import { onMount } from 'svelte';
+    import { createEventDispatcher, onMount } from 'svelte';
     import { dndzone } from 'svelte-dnd-action';
     import { flip } from 'svelte/animate';
     import LeftArrowIcon from "$lib/components/icon/LeftArrowIcon.svelte";
@@ -8,6 +8,7 @@
     import ZoomOutIcon from "$lib/components/icon/ZoomOutIcon.svelte";
     import ZoomInIcon from "$lib/components/icon/ZoomInIcon.svelte";
     import FoldersIcon from "$lib/components/icon/FoldersIcon.svelte";
+    import { getCroppedImg } from '$lib/util/getCroppedImg.js';
 
     export let images = []; // 부모로부터 전달받은 이미지 배열
     export let onImagesUpdate = () => {}; // 부모에게 변경된 이미지를 전달하기 위한 콜백 함수
@@ -15,21 +16,52 @@
 
     // 로컬 상태로 관리할 이미지 배열
     let localImages = [];
+    let originalImages = []; // 원본 이미지를 저장할 배열
 
     let aspect = 1;
     let selectedImageIndex = 0; // 자를 이미지를 선택할 인덱스
 
     // 썸네일 모달 표시 여부
     let showThumbnailModal = false;
+    let cropperRef;
+
+    const dispatch = createEventDispatcher();
 
     onMount(() => {
-        // 이미지 객체에 자르기 정보 추가
         localImages = images.map(image => ({
             ...image,
             crop: { x: 0, y: 0 },
             zoom: 1,
+            rotation: 0,
             croppedAreaPixels: null
         }));
+
+        // Deep copy original images
+        originalImages = localImages.map(image => ({
+            ...image,
+            file: image.file,
+            preview: image.preview
+        }));
+
+        // Load the image to get its dimensions
+        const imageItem = localImages[selectedImageIndex];
+        const img = new Image();
+        img.onload = () => {
+            const naturalWidth = img.naturalWidth;
+            const naturalHeight = img.naturalHeight;
+
+            // Set croppedAreaPixels to cover the full image
+            if (imageItem) {
+                imageItem.croppedAreaPixels = {
+                    x: 0,
+                    y: 0,
+                    width: naturalWidth,
+                    height: naturalHeight
+                };
+                console.log('Initial croppedAreaPixels set:', imageItem.croppedAreaPixels);
+            }
+        };
+        img.src = imageItem.preview;
     });
 
     // 반응형 문법을 사용하여 selectedImageIndex의 유효성 보장
@@ -50,10 +82,16 @@
         }));
     }
 
-    const handleCropComplete = (croppedAreaPixelsResult) => {
+    const handleCropComplete = (e) => {
+        console.log('Event received:', e);
+        console.log('e.detail:', e.detail);
+
+        const croppedAreaPixels = e.detail.pixels; // Use 'pixels' instead of 'croppedAreaPixels'
+        console.log('croppedAreaPixels:', croppedAreaPixels);
+
         if (localImages[selectedImageIndex]) {
-            localImages[selectedImageIndex].croppedAreaPixels = croppedAreaPixelsResult;
-            onCropComplete(localImages.map(img => img.croppedAreaPixels));
+            localImages[selectedImageIndex].croppedAreaPixels = croppedAreaPixels;
+            console.log('croppedAreaPixels updated:', croppedAreaPixels);
         }
     };
 
@@ -74,6 +112,7 @@
     const resetCropState = () => {
         if (localImages[selectedImageIndex]) {
             localImages[selectedImageIndex].crop = { x: 0, y: 0 };
+            localImages[selectedImageIndex].zoom = 1;
             localImages = [...localImages]; // 반응성 유지
         }
     };
@@ -116,6 +155,75 @@
             localImages[selectedImageIndex].zoom = Math.max(localImages[selectedImageIndex].zoom - 0.1, 1);
             localImages = [...localImages]; // 반응성 유지
             console.log('Zoom decreased for image:', localImages[selectedImageIndex]?.id, 'New zoom:', localImages[selectedImageIndex].zoom);
+        }
+    };
+
+    const processCroppedImages = async () => {
+        console.log('Processing current image!');
+        try {
+            const imageItem = localImages[selectedImageIndex];
+            const croppedAreaPixels = imageItem.croppedAreaPixels;
+            const zoom = imageItem.zoom;
+
+            if (!croppedAreaPixels) {
+                console.error('croppedAreaPixels is not available for image:', imageItem.id);
+                alert('Please adjust the crop area before saving.');
+                return;
+            }
+
+            console.log('CroppedAreaPixels:', croppedAreaPixels, 'Zoom:', zoom);
+
+            // Get the cropped image blob
+            const croppedBlob = await getCroppedImg(
+                imageItem.preview,
+                croppedAreaPixels,
+                zoom
+            );
+
+            if (!croppedBlob) {
+                console.error('croppedBlob is invalid for image:', imageItem.id);
+                return;
+            }
+
+            // Update the imageItem with the new file and preview
+            imageItem.file = new File([croppedBlob], imageItem.file.name, {
+                type: imageItem.file.type,
+                lastModified: new Date().getTime(),
+            });
+            imageItem.preview = URL.createObjectURL(croppedBlob);
+
+            // Reset crop and zoom
+            imageItem.crop = { x: 0, y: 0 };
+            imageItem.zoom = 1;
+            imageItem.croppedAreaPixels = null;
+            console.log('Updated image item:', imageItem);
+
+            // Update localImages to trigger reactivity
+            localImages = [...localImages];
+            // Notify parent component with updated images
+            onImagesUpdate(localImages);
+        } catch (error) {
+            console.error('Error processing cropped image:', error);
+            alert('이미지 처리 중 오류가 발생했습니다.');
+        }
+    };
+
+    const resetCurrentCrop = () => {
+        const image = localImages[selectedImageIndex];
+        const originalImage = originalImages.find(orig => orig.id === image.id);
+
+        if (image && originalImage) {
+            // Restore original file and preview if they were modified
+            image.file = originalImage.file;
+            image.preview = originalImage.preview;
+
+            // Reset cropping-related properties
+            image.crop = { x: 0, y: 0 };
+            image.zoom = 1;
+            image.croppedAreaPixels = null;
+
+            // Update localImages to trigger reactivity
+            localImages = [...localImages];
         }
     };
 </script>
@@ -203,6 +311,12 @@
     .arrow-button {
         z-index: 20 !important; /* 높은 z-index 설정 */
     }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
 </style>
 
 <div class="cropper-container">
@@ -212,19 +326,19 @@
                 image={localImages[selectedImageIndex].preview}
                 bind:crop={localImages[selectedImageIndex].crop}
                 bind:zoom={localImages[selectedImageIndex].zoom}
-                bind:aspect={aspect}
+                aspect={aspect}
                 on:cropcomplete={handleCropComplete}
                 background={false}
                 style={{
                 cropAreaStyle: {
-                    backgroundColor: 'transparent',
+                  backgroundColor: 'transparent',
                 },
                 mediaStyle: {
-                    objectFit: 'cover',
-                    width: '100%',
-                    height: '100%',
+                  objectFit: 'cover',
+                  width: '100%',
+                  height: '100%',
                 },
-            }}
+        }}
         />
     {/if}
 
@@ -284,6 +398,16 @@
     {/each}
 </div>
 
+<!-- 저장 및 초기화 버튼 -->
+<div class="action-buttons">
+    <button class="btn btn-primary" on:click={processCroppedImages}>
+        저장
+    </button>
+    <button class="btn btn-outline" on:click={resetCurrentCrop}>
+        초기화
+    </button>
+</div>
+
 <!-- 썸네일 모달 -->
 {#if showThumbnailModal}
     <div class="thumbnail-overlay" on:click={toggleThumbnailModal}></div>
@@ -300,9 +424,9 @@
                         class="thumbnail-item {image.id === localImages[selectedImageIndex].id ? 'selected' : ''}"
                         animate:flip={{ duration: 300 }}
                         on:click={() => {
-                        selectedImageIndex = localImages.findIndex((img) => img.id === image.id);
-                        showThumbnailModal = false;
-                    }}
+            selectedImageIndex = localImages.findIndex((img) => img.id === image.id);
+            showThumbnailModal = false;
+          }}
                 >
                     <img src={image.preview} alt="Thumbnail" />
                 </div>
