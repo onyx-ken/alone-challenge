@@ -15,6 +15,9 @@ spring:
       ddl-auto: validate
   messages:
     basename: errors
+  servlet:
+    multipart:
+      max-file-size: 20MB
 
 storage:
   path:
@@ -60,7 +63,8 @@ management:
       enabled: false
 image:
   base-url: http://localhost:8002/challenge-images/
-
+endpoint:
+  front: http://localhost:5173
 ---
 
 spring:

@@ -15,9 +15,6 @@ import java.util.List;
 @Data
 public class CreateRequest {
 
-    @NotNull(message = "userId는 필수입니다.")
-    private Long userId;
-
     @NotBlank(message = "nickName은 필수입니다.")
     private String nickName;
 
@@ -37,9 +34,9 @@ public class CreateRequest {
 
     private List<ImageData> images = new ArrayList<>();
 
-    public ChallengeInputDTO toDTO() {
+    public ChallengeInputDTO toDTO(Long userId) {
         return ChallengeInputDTO.builder()
-                .userId(this.userId)
+                .userId(userId)
                 .nickName(this.nickName)
                 .startDate(this.startDate)
                 .endDate(this.endDate)

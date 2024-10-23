@@ -152,15 +152,6 @@
         selectedBackground = event.detail; // 배경 선택 시 선택된 배경 이미지 변경
     }
 
-    const handleTextChange = (event) => {
-        userText = event.target.value; // 입력된 글 내용 저장
-    }
-
-    const selectBackground = (background) => {
-        selectedBackground = background;
-        dispatch('select', selectedBackground); // Svelte의 dispatch 함수를 사용해 이벤트 전달
-    }
-
     const handleImagesUpdate = (updatedImages) => {
         uploadedImages = updatedImages;
     };
@@ -195,17 +186,53 @@
 
     const handleShare = async () => {
         try {
+            // 서버로 이미지 생성 요청
+            const imageResponse = await fetch('/api/generate-certificate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ challengeData, selectedBackground }),
+            });
 
+            if (!imageResponse.ok) {
+                throw new Error('Failed to generate certificate image');
+            }
+
+            const { imageBase64 } = await imageResponse.json();
+
+            // Base64 문자열을 Blob으로 변환
+            const byteCharacters = atob(imageBase64);
+            const byteNumbers = new Array(byteCharacters.length).fill().map((_, i) => byteCharacters.charCodeAt(i));
+            const byteArray = new Uint8Array(byteNumbers);
+            const certificateImageFile = new File([byteArray], 'certificate.png', { type: 'image/png' });
 
             // 이미지 배열 준비
             let imagesToUpload = [];
 
             if (uploadedImages.length === 0) {
-
+                // 업로드된 이미지가 없는 경우
+                imagesToUpload.push({
+                    file: certificateImageFile,
+                    order: 1,
+                    type: 'CHALLENGE_CARD'
+                });
             } else {
                 if (setAsRepresentativeImage) {
+                    // 도전장 이미지를 대표 이미지로 설정한 경우
+                    imagesToUpload.push({
+                        file: certificateImageFile,
+                        order: 1,
+                        type: 'CHALLENGE_CARD'
+                    });
 
-
+                    uploadedImages.forEach((img, index) => {
+                        imagesToUpload.push({
+                            file: img.file,
+                            order: index + 2, // 도전장 이미지 다음부터 순서 지정
+                            type: 'USER_UPLOAD'
+                        });
+                    });
+                } else {
+                    // 업로드된 이미지를 먼저 추가
                     uploadedImages.forEach((img, index) => {
                         imagesToUpload.push({
                             file: img.file,
@@ -213,16 +240,13 @@
                             type: 'USER_UPLOAD'
                         });
                     });
-                } else {
-                    // 도전장 이미지를 대표이미지로 설정하지 않은 경우
-                    uploadedImages.forEach((img, index) => {
-                        imagesToUpload.push({
-                            file: img.file,
-                            order: index,
-                            type: 'USER_UPLOAD'
-                        });
-                    });
 
+                    // 도전장 이미지를 마지막에 추가
+                    imagesToUpload.push({
+                        file: certificateImageFile,
+                        order: imagesToUpload.length + 1,
+                        type: 'CHALLENGE_CARD'
+                    });
                 }
             }
 

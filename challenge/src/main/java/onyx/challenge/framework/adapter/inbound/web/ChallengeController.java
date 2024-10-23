@@ -8,10 +8,7 @@ import onyx.challenge.framework.adapter.inbound.web.api.ApiResponse;
 import onyx.challenge.framework.adapter.inbound.web.api.ApiStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,8 +35,9 @@ public class ChallengeController {
     }
 
     @PostMapping("/challenges")
-    public ResponseEntity<ApiResponse<CreateResponse>> createChallenge(@ModelAttribute @Valid CreateRequest request) {
-        CreateResponse response = CreateResponse.toDTO(createChallengeUseCase.createChallenge(request.toDTO()));
+    public ResponseEntity<ApiResponse<CreateResponse>> createChallenge(@ModelAttribute @Valid CreateRequest request,
+                                                                       @RequestHeader("X-User-Id") Long userId) {
+        CreateResponse response = CreateResponse.toDTO(createChallengeUseCase.createChallenge(request.toDTO(userId)));
         return ResponseEntity.ok(ApiResponse.create(ApiStatus.SUCCESS, "챌린지가 정상적으로 생성되었습니다.", response));
     }
 
