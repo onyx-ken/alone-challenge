@@ -15,11 +15,11 @@
 <svelte:head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&display=swap" rel="stylesheet">
 </svelte:head>
 
 <!-- A4 비율을 맞춘 도전장 미리보기 -->
-<div class="text-black p-8 bg-base-200 rounded-lg shadow-lg w-full max-w-md mx-auto text-center nanum-brush-script-regular">
+<div class="text-black p-8 bg-base-200 rounded-lg shadow-lg w-full max-w-md mx-auto text-center dongle-regular">
     <div class="bg-white p-6 rounded-lg shadow-lg border-4 border-gray-300 relative certificate-container"
          style="background-image: url({background}); background-size: cover; background-position: center;">
         <h1 class="text-6xl font-bold mb-6">도전장</h1>
@@ -59,8 +59,8 @@
         text-align: center; /* 텍스트 가운데 정렬 */
     }
 
-    .nanum-brush-script-regular {
-        font-family: "Nanum Brush Script", cursive;
+    .dongle-regular {
+        font-family: "Dongle", sans-serif;
         font-weight: 400;
         font-style: normal;
     }

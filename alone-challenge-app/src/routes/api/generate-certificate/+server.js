@@ -27,9 +27,21 @@ export async function POST({ request, url }) {
             },
             fonts: [
                 {
-                    name: 'Nanum Brush Script',
-                    url: `${url.origin}/fonts/NanumBrushScript-Regular.ttf`,
+                    name: 'Dongle',
+                    url: `${url.origin}/fonts/Dongle-Light.ttf`,
+                    weight: 300,
+                    style: 'normal',
+                },
+                {
+                    name: 'Dongle',
+                    url: `${url.origin}/fonts/Dongle-Regular.ttf`,
                     weight: 400,
+                    style: 'normal',
+                },
+                {
+                    name: 'Dongle',
+                    url: `${url.origin}/fonts/Dongle-Bold.ttf`,
+                    weight: 700,
                     style: 'normal',
                 },
             ],

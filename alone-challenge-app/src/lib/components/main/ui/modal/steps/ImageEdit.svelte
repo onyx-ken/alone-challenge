@@ -1,6 +1,5 @@
 <script>
-    import Cropper from 'svelte-easy-crop';
-    import { createEventDispatcher, onMount } from 'svelte';
+    import { createEventDispatcher, onMount, onDestroy } from 'svelte';
     import { dndzone } from 'svelte-dnd-action';
     import { flip } from 'svelte/animate';
     import LeftArrowIcon from "$lib/components/icon/LeftArrowIcon.svelte";
@@ -8,12 +7,12 @@
     import ZoomOutIcon from "$lib/components/icon/ZoomOutIcon.svelte";
     import ZoomInIcon from "$lib/components/icon/ZoomInIcon.svelte";
     import FoldersIcon from "$lib/components/icon/FoldersIcon.svelte";
-    import {getCroppedImg} from '$lib/util/getCroppedImg.js';
+    import Cropper from 'cropperjs';
+    import 'cropperjs/dist/cropper.css';
 
     // 부모로부터 전달받은 프롭스
     export let images = []; // 이미지 배열
-    export let onImagesUpdate = () => {
-    }; // 변경된 이미지를 부모에게 전달하는 콜백 함수
+    export let onImagesUpdate = () => { }; // 변경된 이미지를 부모에게 전달하는 콜백 함수
 
     // 내부 상태 관리 변수
     let localImages = []; // 로컬에서 관리할 이미지 배열
@@ -24,6 +23,10 @@
 
     const dispatch = createEventDispatcher();
 
+    // Cropper.js 관련 변수
+    let cropperInstance; // Cropper 인스턴스
+    let imageElement; // 이미지 요소 참조
+
     // 컴포넌트 마운트 시 초기화
     onMount(() => {
         if (!images || images.length === 0) {
@@ -32,17 +35,20 @@
         }
         initializeImages();
         initializeOriginalImages();
-        setInitialCroppedArea();
+        setInitialImage();
+    });
+
+    // 컴포넌트 언마운트 시 Cropper 인스턴스 파기
+    onDestroy(() => {
+        if (cropperInstance) {
+            cropperInstance.destroy();
+        }
     });
 
     // 이미지 배열 초기화
     function initializeImages() {
         localImages = images.map(image => ({
             ...image,
-            crop: {x: 0, y: 0},
-            zoom: 1,
-            rotation: 0,
-            croppedAreaPixels: null,
         }));
     }
 
@@ -55,27 +61,47 @@
         }));
     }
 
-    // 선택된 이미지의 초기 크롭 영역 설정
-    function setInitialCroppedArea() {
-        const imageItem = localImages[selectedImageIndex];
-        if (!imageItem) {
-            console.warn('No imageItem found at selectedImageIndex:', selectedImageIndex);
+    // 선택된 이미지 설정 및 Cropper 인스턴스 초기화
+    function setInitialImage() {
+        if (!localImages[selectedImageIndex]) {
+            console.warn('No image found at selectedImageIndex:', selectedImageIndex);
             return;
         }
 
-        const img = new Image();
-        img.onload = () => {
-            const {naturalWidth, naturalHeight} = img;
-            imageItem.croppedAreaPixels = {
-                x: 0,
-                y: 0,
-                width: naturalWidth,
-                height: naturalHeight,
-            };
-            console.log('Initial croppedAreaPixels set:', imageItem.croppedAreaPixels);
+        // 이미지 요소가 존재하지 않으면 종료
+        if (!imageElement) {
+            console.warn('Image element is not available.');
+            return;
+        }
+
+        // 이미지 요소의 소스 업데이트
+        imageElement.src = localImages[selectedImageIndex].preview;
+
+        // 이미지 로드 이벤트 핸들러 설정
+        imageElement.onload = () => {
+            // 기존 Cropper 인스턴스 파기
+            if (cropperInstance) {
+                cropperInstance.destroy();
+                cropperInstance = null;
+            }
+
+            // 새로운 Cropper 인스턴스 생성
+            cropperInstance = new Cropper(imageElement, {
+                aspectRatio: aspect,
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 1,
+                responsive: true,
+                restore: false,
+                background: false,
+                rotatable: true,
+                zoomable: true,
+                scalable: true,
+                checkOrientation: false,
+            });
         };
-        img.src = imageItem.preview;
     }
+
 
     // 반응형으로 selectedImageIndex의 유효성 보장
     $: validateSelectedImageIndex();
@@ -86,6 +112,8 @@
         } else if (selectedImageIndex >= localImages.length) {
             selectedImageIndex = localImages.length > 0 ? localImages.length - 1 : 0;
         }
+        // 이미지 변경 시 Cropper 인스턴스 업데이트
+        setInitialImage();
     }
 
     // 이미지 배열 길이가 변경되었을 때 localImages 업데이트
@@ -96,25 +124,8 @@
     function updateLocalImages() {
         localImages = images.map(image => ({
             ...image,
-            crop: image.crop || {x: 0, y: 0},
-            zoom: image.zoom || 1,
-            croppedAreaPixels: image.croppedAreaPixels || null,
         }));
     }
-
-    // 크롭 완료 이벤트 핸들러
-    const handleCropComplete = (e) => {
-        console.log('Event received:', e);
-        console.log('e.detail:', e.detail);
-
-        const croppedAreaPixels = e.detail.pixels;
-        console.log('croppedAreaPixels:', croppedAreaPixels);
-
-        if (localImages[selectedImageIndex]) {
-            localImages[selectedImageIndex].croppedAreaPixels = croppedAreaPixels;
-            console.log('croppedAreaPixels updated:', croppedAreaPixels);
-        }
-    };
 
     // 이미지 순서 변경 관련 함수
     function handleDndConsider(e) {
@@ -125,7 +136,9 @@
         localImages = e.detail.items;
         onImagesUpdate(localImages);
         updateSelectedImageIndex();
+        setInitialImage();
     }
+
 
     function updateSelectedImageIndex() {
         const oldSelectedImageId = localImages[selectedImageIndex]?.id;
@@ -149,10 +162,8 @@
 
     // 크롭 상태 초기화
     function resetCropState() {
-        if (localImages[selectedImageIndex]) {
-            localImages[selectedImageIndex].crop = {x: 0, y: 0};
-            localImages[selectedImageIndex].zoom = 1;
-            localImages = [...localImages]; // 반응성 유지
+        if (cropperInstance) {
+            cropperInstance.reset();
         }
     }
 
@@ -174,19 +185,16 @@
         image.file = originalImage.file;
         image.preview = originalImage.preview;
 
-        // 크롭 관련 속성 초기화
-        image.crop = {x: 0, y: 0};
-        image.zoom = 1;
-        image.croppedAreaPixels = null;
-
-        // 반응성 유지
-        localImages = [...localImages];
+        // Cropper 인스턴스 재설정
+        setInitialImage();
     }
 
     // 크롭 비율 설정
     function setAspect(ratio) {
-        aspect = ratio || null;
-        resetCropState();
+        aspect = ratio || NaN;
+        if (cropperInstance) {
+            cropperInstance.setAspectRatio(aspect);
+        }
     }
 
     // 썸네일 모달 토글
@@ -204,69 +212,94 @@
     }
 
     function adjustZoom(delta) {
-        if (localImages[selectedImageIndex]) {
-            const newZoom = localImages[selectedImageIndex].zoom + delta;
-            localImages[selectedImageIndex].zoom = Math.min(Math.max(newZoom, 1), 3);
-            localImages = [...localImages]; // 반응성 유지
-            console.log('Zoom adjusted for image:', localImages[selectedImageIndex]?.id, 'New zoom:', localImages[selectedImageIndex].zoom);
+        if (cropperInstance) {
+            cropperInstance.zoom(delta);
         }
+    }
+
+    // 이미지 회전
+    function rotate(direction) {
+        if (cropperInstance) {
+            if (direction === 'left') {
+                cropperInstance.rotate(-90);
+            } else if (direction === 'right') {
+                cropperInstance.rotate(90);
+            }
+        }
+        // 회전 후 크롭 박스 재설정
+        cropperInstance.clear();
+        cropperInstance.crop();
+
+        // 이미지 위치 가운데로 조정
+        centerImage();
+    }
+
+    function centerImage() {
+        // 컨테이너 크기 가져오기
+        const containerData = cropperInstance.getContainerData();
+        // 이미지 크기 가져오기
+        const imageData = cropperInstance.getCanvasData();
+
+        // 이미지의 중심 좌표 계산
+        const imageCenterX = imageData.left + imageData.width / 2;
+        const imageCenterY = imageData.top + imageData.height / 2;
+
+        // 컨테이너의 중심 좌표 계산
+        const containerCenterX = containerData.width / 2;
+        const containerCenterY = containerData.height / 2;
+
+        // 이동할 거리 계산
+        const moveX = containerCenterX - imageCenterX;
+        const moveY = containerCenterY - imageCenterY;
+
+        // 이미지 이동
+        cropperInstance.move(moveX, moveY);
     }
 
     // 현재 이미지 크롭 후 저장
     async function processCroppedImages() {
-        console.log('Processing current image!');
+        if (!cropperInstance) {
+            console.error('Cropper instance is not available.');
+            return;
+        }
+
         try {
-            const imageItem = localImages[selectedImageIndex];
-            const {croppedAreaPixels, zoom} = imageItem;
-
-            if (!croppedAreaPixels) {
-                console.error('croppedAreaPixels is not available for image:', imageItem.id);
-                alert('저장하기 전에 크롭 영역을 조정해주세요.');
+            const canvas = cropperInstance.getCroppedCanvas();
+            if (!canvas) {
+                console.error('Failed to get cropped canvas.');
                 return;
             }
 
-            console.log('CroppedAreaPixels:', croppedAreaPixels, 'Zoom:', zoom);
+            // Canvas를 Blob으로 변환
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    console.error('Failed to convert canvas to blob.');
+                    return;
+                }
 
-            // 크롭된 이미지 가져오기
-            const croppedBlob = await getCroppedImg(
-                imageItem.preview,
-                croppedAreaPixels,
-                zoom
-            );
+                const imageItem = localImages[selectedImageIndex];
 
-            if (!croppedBlob) {
-                console.error('croppedBlob is invalid for image:', imageItem.id);
-                return;
-            }
+                // Blob을 파일로 변환하여 업데이트
+                imageItem.file = new File([blob], imageItem.file.name, {
+                    type: imageItem.file.type,
+                    lastModified: new Date().getTime(),
+                });
 
-            // 이미지 업데이트
-            updateImageItem(imageItem, croppedBlob);
+                imageItem.preview = URL.createObjectURL(blob);
 
-            // 부모 컴포넌트에 업데이트 알림
-            onImagesUpdate(localImages);
+                // 로컬 이미지 배열 업데이트
+                localImages = [...localImages];
+
+                // 부모 컴포넌트에 업데이트 알림
+                onImagesUpdate(localImages);
+
+                // Cropper 인스턴스 재초기화
+                setInitialImage();
+            }, 'image/jpeg');
         } catch (error) {
             console.error('Error processing cropped image:', error);
             alert('이미지 처리 중 오류가 발생했습니다.');
         }
-    }
-
-    // 이미지 아이템 업데이트
-    function updateImageItem(imageItem, croppedBlob) {
-        imageItem.file = new File([croppedBlob], imageItem.file.name, {
-            type: imageItem.file.type,
-            lastModified: new Date().getTime(),
-        });
-        imageItem.preview = URL.createObjectURL(croppedBlob);
-
-        // 크롭 관련 속성 초기화
-        imageItem.crop = {x: 0, y: 0};
-        imageItem.zoom = 1;
-        imageItem.croppedAreaPixels = null;
-
-        console.log('Updated image item:', imageItem);
-
-        // 반응성 유지
-        localImages = [...localImages];
     }
 </script>
 
@@ -284,6 +317,8 @@
         position: absolute;
         bottom: 10px;
         right: 10px;
+        display: flex;
+        gap: 10px;
         z-index: 10;
     }
 
@@ -341,13 +376,17 @@
     .cropper-container {
         position: relative;
         width: 100%;
-        height: 400px;
+        max-height: 80vh; /* 최대 높이 설정 */
     }
 
-    :global(.cropper) {
-        width: 100%;
-        height: 100%;
-        z-index: 1; /* 낮은 z-index 설정 */
+    img {
+        max-width: 100%;
+        height: auto;
+        display: block; /* 이미지가 중앙에 정렬되도록 */
+    }
+
+    :global(.cropper-container .cropper-drag-box) {
+        cursor: default;
     }
 
     .arrow-button {
@@ -363,73 +402,81 @@
 
 <div class="cropper-container">
     {#if localImages[selectedImageIndex]}
-        <Cropper
-                class="cropper"
-                image={localImages[selectedImageIndex].preview}
-                bind:crop={localImages[selectedImageIndex].crop}
-                bind:zoom={localImages[selectedImageIndex].zoom}
-                aspect={aspect}
-                on:cropcomplete={handleCropComplete}
-                background={false}
-                style={{
-        cropAreaStyle: {
-          backgroundColor: 'transparent',
-        },
-        mediaStyle: {
-          objectFit: 'cover',
-          width: '100%',
-          height: '100%',
-        },
-      }}
-        />
-    {/if}
+        <!-- 이미지 요소 -->
+        <img bind:this={imageElement} src={localImages[selectedImageIndex].preview} alt="이미지 자르기" />
 
-    <!-- 컨트롤 패널 -->
-    <div class="controls">
-        <!-- 비율 선택 버튼 -->
-        <button class="btn btn-circle btn-sm" on:click={() => setAspect(1)}>
-            <span class="text-xs">1:1</span>
-        </button>
-        <button class="btn btn-circle btn-sm" on:click={() => setAspect(4 / 5)}>
-            <span class="text-xs">4:5</span>
-        </button>
-        <button class="btn btn-circle btn-sm" on:click={() => setAspect(16 / 9)}>
-            <span class="text-xs">16:9</span>
-        </button>
+        <!-- 컨트롤 패널 -->
+        <div class="controls">
+            <!-- 비율 선택 버튼 -->
+            <button class="btn btn-circle btn-sm" on:click={() => setAspect(1)}>
+                <span class="text-xs">1:1</span>
+            </button>
+            <button class="btn btn-circle btn-sm" on:click={() => setAspect(4 / 5)}>
+                <span class="text-xs">4:5</span>
+            </button>
+            <button class="btn btn-circle btn-sm" on:click={() => setAspect(16 / 9)}>
+                <span class="text-xs">16:9</span>
+            </button>
 
-        <!-- 줌 컨트롤 버튼 -->
-        <button class="btn btn-circle btn-sm" on:click={decreaseZoom}>
-            <ZoomOutIcon/>
-        </button>
-        <button class="btn btn-circle btn-sm" on:click={increaseZoom}>
-            <ZoomInIcon/>
-        </button>
-    </div>
+            <!-- 줌 컨트롤 버튼 -->
+            <button class="btn btn-circle btn-sm" on:click={decreaseZoom}>
+                <ZoomOutIcon />
+            </button>
+            <button class="btn btn-circle btn-sm" on:click={increaseZoom}>
+                <ZoomInIcon />
+            </button>
 
-    <!-- 썸네일 모달 토글 버튼 -->
-    <div class="thumbnail-button">
-        <button class="btn btn-circle btn-sm" on:click={toggleThumbnailModal}>
-            <FoldersIcon/>
-        </button>
-    </div>
+            <!-- 회전 컨트롤 버튼 -->
+            <button class="btn btn-circle btn-sm" on:click={() => rotate('left')}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                </svg>
+            </button>
+            <button class="btn btn-circle btn-sm" on:click={() => rotate('right')}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m15 15 6-6m0 0-6-6m6 6H9a6 6 0 0 0 0 12h3" />
+                </svg>
+            </button>
+        </div>
 
-    <!-- 이미지 전환 버튼 -->
-    {#if selectedImageIndex > 0}
-        <button
-                class="absolute left-6 top-1/2 transform -translate-y-1/2 btn btn-circle btn-outline arrow-button"
-                on:click={selectPreviousImage}
-        >
-            <LeftArrowIcon/>
-        </button>
-    {/if}
+        <!-- 액션 버튼 -->
+        <div class="thumbnail-button">
+            <button class="btn btn-circle btn-sm" on:click={processCroppedImages}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+            </button>
+            <button class="btn btn-circle btn-sm" on:click={resetCurrentCrop}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+            </button>
+            {#if localImages.length > 1}
+            <button class="btn btn-circle btn-sm" on:click={toggleThumbnailModal}>
+                <FoldersIcon />
+            </button>
+            {/if}
+        </div>
 
-    {#if selectedImageIndex < localImages.length - 1}
-        <button
-                class="absolute right-6 top-1/2 transform -translate-y-1/2 btn btn-circle btn-outline arrow-button"
-                on:click={selectNextImage}
-        >
-            <RightArrowIcon/>
-        </button>
+        <!-- 썸네일 모달 토글 버튼(이미지 순서변경, 2개 이상일 때만 표시) -->
+        <!-- 이미지 전환 버튼 -->
+        {#if selectedImageIndex > 0}
+            <button
+                    class="absolute left-6 top-1/2 transform -translate-y-1/2 btn btn-circle btn-outline arrow-button"
+                    on:click={selectPreviousImage}
+            >
+                <LeftArrowIcon />
+            </button>
+        {/if}
+
+        {#if selectedImageIndex < localImages.length - 1}
+            <button
+                    class="absolute right-6 top-1/2 transform -translate-y-1/2 btn btn-circle btn-outline arrow-button"
+                    on:click={selectNextImage}
+            >
+                <RightArrowIcon />
+            </button>
+        {/if}
     {/if}
 </div>
 
@@ -438,16 +485,6 @@
     {#each localImages as _, index}
         <div class="w-3 h-3 rounded-full {index === selectedImageIndex ? 'bg-blue-500' : 'bg-gray-400'}"></div>
     {/each}
-</div>
-
-<!-- 액션 버튼 -->
-<div class="action-buttons">
-    <button class="btn btn-primary" on:click={processCroppedImages}>
-        저장
-    </button>
-    <button class="btn btn-outline" on:click={resetCurrentCrop}>
-        초기화
-    </button>
 </div>
 
 <!-- 썸네일 모달 -->
@@ -466,11 +503,11 @@
                         class="thumbnail-item {image.id === localImages[selectedImageIndex].id ? 'selected' : ''}"
                         animate:flip={{ duration: 300 }}
                         on:click={() => {
-            selectedImageIndex = localImages.findIndex((img) => img.id === image.id);
-            showThumbnailModal = false;
-          }}
+                        selectedImageIndex = localImages.findIndex((img) => img.id === image.id);
+                        showThumbnailModal = false;
+                    }}
                 >
-                    <img src={image.preview} alt="Thumbnail"/>
+                    <img src={image.preview} alt="Thumbnail" />
                 </div>
             {/each}
         </div>
