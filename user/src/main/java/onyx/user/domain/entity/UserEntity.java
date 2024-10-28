@@ -1,5 +1,6 @@
 package onyx.user.domain.entity;
 
+import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,12 +21,16 @@ import onyx.user.domain.valueobject.Profile;
 @Getter
 public class UserEntity extends BaseJPAEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @Tsid
     private Long id;
 
     private String nickName;
 
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "localPart", column = @Column(name = "local_part")),
+            @AttributeOverride(name = "domainPart", column = @Column(name = "domain_part"))
+    })
     private Email email;
 
     @Embedded
@@ -69,5 +74,4 @@ public class UserEntity extends BaseJPAEntity {
         this.email = email;
         this.oauthInfo = oauthInfo;
     }
-
 }

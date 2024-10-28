@@ -54,5 +54,4 @@ public class Email {
         this.localPart = localPart;
         this.domainPart = domainPart;
     }
-
 }

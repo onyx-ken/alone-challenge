@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.1'
     id 'io.spring.dependency-management' version '1.1.5'
+    id 'org.flywaydb.flyway' version '10.18.2'
 }
 
 group = 'onyx'
@@ -43,6 +44,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.2'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.2'
     implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+    implementation 'org.flywaydb:flyway-core'
+    implementation group: 'io.hypersistence', name: 'hypersistence-utils-hibernate-63', version: '3.8.3'
     testImplementation 'org.springframework.security:spring-security-test'
     implementation group: 'com.github.codemonstur', name: 'embedded-redis', version: '1.4.3'
     compileOnly 'org.projectlombok:lombok'
@@ -61,4 +64,13 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// Flyway 설정
+flyway {
+    url = "jdbc:h2:file:${projectDir}/build/data/user;MODE=PostgreSQL;AUTO_SERVER=TRUE;DEFAULT_NULL_ORDERING=HIGH"
+    user = 'sa'
+    password = ''
+    schemas = ['PUBLIC']  // H2 에서는 대문자 사용
+    locations = ['filesystem:src/main/resources/db/migration']
 }

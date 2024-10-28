@@ -1,8 +1,7 @@
 package onyx.file.domain;
 
+import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,8 +15,7 @@ import java.io.File;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FileInfo extends BaseJPAEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @Tsid
     private Long id;
 
     private String path;
@@ -53,5 +51,4 @@ public class FileInfo extends BaseJPAEntity {
         int dotIndex = fileName.lastIndexOf('.');
         return dotIndex >= 0 ? fileName.substring(dotIndex + 1) : "";
     }
-
 }
