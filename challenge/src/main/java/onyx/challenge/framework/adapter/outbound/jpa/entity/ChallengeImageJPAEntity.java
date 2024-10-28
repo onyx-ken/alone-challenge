@@ -1,5 +1,6 @@
 package onyx.challenge.framework.adapter.outbound.jpa.entity;
 
+import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,8 +14,7 @@ import onyx.challenge.domain.vo.ImageType;
 @Getter
 public class ChallengeImageJPAEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @Tsid
     private Long id; // 이미지 ID (imageId)
 
     @Column(nullable = false)

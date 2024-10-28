@@ -44,6 +44,7 @@ dependencies {
     runtimeOnly group:'com.h2database', name: 'h2', version: '2.2.224'
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.flywaydb:flyway-core'
+    implementation group: 'io.hypersistence', name: 'hypersistence-utils-hibernate-63', version: '3.8.3'
 
     // JOOQ Dependencies
     implementation group: 'org.jooq', name: 'jooq', version: '3.19.13'
@@ -123,7 +124,7 @@ jooq {
 
 // Flyway 설정
 flyway {
-    url = "jdbc:h2:file:${projectDir}/build/data/testdb;MODE=PostgreSQL;AUTO_SERVER=TRUE;DEFAULT_NULL_ORDERING=HIGH"
+    url = "jdbc:h2:file:${projectDir}/build/data/challenge;MODE=PostgreSQL;AUTO_SERVER=TRUE;DEFAULT_NULL_ORDERING=HIGH"
     user = 'sa'
     password = ''
     schemas = ['PUBLIC']  // H2 에서는 대문자 사용

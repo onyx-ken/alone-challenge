@@ -1,5 +1,6 @@
 package onyx.challenge.framework.adapter.outbound.jpa.entity;
 
+import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,8 +17,7 @@ import java.time.LocalDateTime;
 @Setter
 public class CommentJPAEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @Tsid
     private Long commentId;
 
     @Column(nullable = false)

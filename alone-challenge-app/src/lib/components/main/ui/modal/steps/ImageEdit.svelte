@@ -372,31 +372,29 @@
     :global(.dragging) {
         opacity: 0.5;
     }
-
     .cropper-container {
         position: relative;
         width: 100%;
-        max-height: 80vh; /* 최대 높이 설정 */
+        height: 400px;
     }
 
-    img {
-        max-width: 100%;
-        height: auto;
-        display: block; /* 이미지가 중앙에 정렬되도록 */
+    /* 내부 .cropper-container가 부모의 크기를 채우도록 설정 */
+    :global(.cropper-container > .cropper-container) {
+        position: absolute;
+        width: 100% !important;
+        height: 100% !important;
     }
 
+
+    /* cropper-drag-box의 크기 조정 */
     :global(.cropper-container .cropper-drag-box) {
+        width: 100% !important;
+        height: 100% !important;
         cursor: default;
     }
 
     .arrow-button {
         z-index: 20 !important; /* 높은 z-index 설정 */
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 10px;
-        margin-top: 10px;
     }
 </style>
 
