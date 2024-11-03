@@ -35,7 +35,6 @@ public class ChallengeControllerTest {
     void whenValidInput_thenReturns200() throws Exception {
         // Given
         CreateRequest request = new CreateRequest();
-        request.setUserId(1L);
         request.setNickName("testUser");
         request.setStartDate(LocalDate.now());
         request.setEndDate(LocalDate.now().plusDays(7));

@@ -5,6 +5,8 @@ import onyx.challenge.application.dto.ChallengeInputDTO;
 import onyx.challenge.application.dto.ChallengeOutputDTO;
 import onyx.challenge.application.port.inbound.CreateChallengeUseCase;
 import onyx.challenge.application.port.outbound.ChallengeRepository;
+import onyx.challenge.application.port.outbound.EventPublisher;
+import onyx.challenge.domain.event.ChallengeCreatedEvent;
 import onyx.challenge.domain.model.Challenge;
 import onyx.challenge.domain.vo.GoalContent;
 import onyx.challenge.domain.vo.GoalType;
@@ -23,6 +25,8 @@ public class CreateChallengeService implements CreateChallengeUseCase {
     private final ChallengeRepository challengeRepository;
 
     private final ChallengeImageProcessService challengeImageProcessService;
+
+    private final EventPublisher eventPublisher;
 
     @Override
     public ChallengeOutputDTO createChallenge(ChallengeInputDTO challengeInputDTO) {
@@ -52,6 +56,9 @@ public class CreateChallengeService implements CreateChallengeUseCase {
 
         // 3. Challenge 저장
         Challenge savedChallenge = challengeRepository.save(challenge);
+
+        // 4/ Challenge 이벤트 생성 및 발행
+        eventPublisher.publish(ChallengeCreatedEvent.create(savedChallenge.getChallengeId(), challengeInputDTO.getUserId()));
 
         return ChallengeOutputDTO.from(savedChallenge, 0);
     }

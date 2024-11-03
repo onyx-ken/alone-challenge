@@ -45,6 +45,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.flywaydb:flyway-core'
     implementation group: 'io.hypersistence', name: 'hypersistence-utils-hibernate-63', version: '3.8.3'
+    implementation 'org.springframework.kafka:spring-kafka'
 
     // JOOQ Dependencies
     implementation group: 'org.jooq', name: 'jooq', version: '3.19.13'
@@ -53,6 +54,7 @@ dependencies {
     jooqGenerator group: 'com.h2database', name: 'h2', version: '2.2.224'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

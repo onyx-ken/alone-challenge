@@ -3,11 +3,10 @@ package onyx.challenge.application.service;
 import onyx.challenge.application.dto.ChallengeInputDTO;
 import onyx.challenge.application.dto.ChallengeOutputDTO;
 import onyx.challenge.application.dto.FileData;
-import onyx.challenge.application.port.outbound.ChallengeImageRepository;
 import onyx.challenge.application.port.outbound.ChallengeRepository;
-import onyx.challenge.application.port.outbound.FileStorage;
+import onyx.challenge.application.port.outbound.EventPublisher;
+import onyx.challenge.domain.event.ChallengeCreatedEvent;
 import onyx.challenge.domain.model.Challenge;
-import onyx.challenge.domain.model.ChallengeImage;
 import onyx.challenge.domain.vo.GoalContent;
 import onyx.challenge.domain.vo.GoalType;
 import onyx.challenge.domain.vo.ImageType;
@@ -15,6 +14,7 @@ import onyx.challenge.domain.vo.Period;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,7 +27,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -40,12 +41,15 @@ class CreateChallengeServiceTest {
     @Mock
     private ChallengeImageProcessService challengeImageProcessService;
 
+    @Mock
+    private EventPublisher eventPublisher;
+
     @InjectMocks
     private CreateChallengeService createChallengeService;
 
     @Test
-    @DisplayName("유효한 ChallengeInputDTO로 챌린지를 생성하면 성공적으로 처리된다")
-    public void givenValidChallengeInputDTO_whenCreateChallenge_thenReturnsChallengeOutputDTO() {
+    @DisplayName("유효한 ChallengeInputDTO로 챌린지를 생성하면 성공적으로 처리되고 이벤트가 발행된다")
+    public void givenValidChallengeInputDTO_whenCreateChallenge_thenReturnsChallengeOutputDTO_andPublishesEvent() {
         // Given
         FileData fileData = FileData.create(
                 "테스트 파일.jpg",
@@ -103,11 +107,19 @@ class CreateChallengeServiceTest {
                 any(FileData.class), anyInt(), any(ImageType.class)
         );
         verify(challengeRepository, times(1)).save(any(Challenge.class));
+
+        // 이벤트 발행 검증
+        ArgumentCaptor<ChallengeCreatedEvent> eventCaptor = ArgumentCaptor.forClass(ChallengeCreatedEvent.class);
+        verify(eventPublisher, times(1)).publish(eventCaptor.capture());
+
+        ChallengeCreatedEvent publishedEvent = eventCaptor.getValue();
+        assertThat(publishedEvent.getChallengeId()).isEqualTo(challenge.getChallengeId());
+        assertThat(publishedEvent.getUserId()).isEqualTo(challenge.getUserId());
     }
 
     @Test
-    @DisplayName("필수 필드가 누락된 경우 IllegalArgumentException이 발생한다")
-    void givenInvalidChallengeInputDTO_whenCreateChallenge_thenThrowsException() {
+    @DisplayName("필수 필드가 누락된 경우 IllegalArgumentException이 발생하고 이벤트가 발행되지 않는다")
+    void givenInvalidChallengeInputDTO_whenCreateChallenge_thenThrowsException_andDoesNotPublishEvent() {
         // Given
         ChallengeInputDTO invalidInputDTO = ChallengeInputDTO.builder()
                 .userId(null) // 필수 필드 누락
@@ -124,12 +136,14 @@ class CreateChallengeServiceTest {
         assertThatThrownBy(() -> createChallengeService.createChallenge(invalidInputDTO))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("회원 ID는 필수입니다.");
+
+        // 이벤트 발행이 일어나지 않았는지 검증
+        verify(eventPublisher, never()).publish(any());
     }
 
-
     @Test
-    @DisplayName("첨부 이미지가 없어도 챌린지가 성공적으로 생성된다")
-    void givenNoAttachedImages_whenCreateChallenge_thenSuccess() {
+    @DisplayName("첨부 이미지가 없어도 챌린지가 성공적으로 생성되고 이벤트가 발행된다")
+    void givenNoAttachedImages_whenCreateChallenge_thenSuccess_andPublishesEvent() {
         // Given
         ChallengeInputDTO challengeInputDTO = ChallengeInputDTO.builder()
                 .userId(1L)
@@ -168,5 +182,13 @@ class CreateChallengeServiceTest {
         // Verify that processImage is not called
         verify(challengeImageProcessService, never()).processImage(any(), anyInt(), any());
         verify(challengeRepository, times(1)).save(any(Challenge.class));
+
+        // 이벤트 발행 검증
+        ArgumentCaptor<ChallengeCreatedEvent> eventCaptor = ArgumentCaptor.forClass(ChallengeCreatedEvent.class);
+        verify(eventPublisher, times(1)).publish(eventCaptor.capture());
+
+        ChallengeCreatedEvent publishedEvent = eventCaptor.getValue();
+        assertThat(publishedEvent.getChallengeId()).isEqualTo(challenge.getChallengeId());
+        assertThat(publishedEvent.getUserId()).isEqualTo(challenge.getUserId());
     }
 }
