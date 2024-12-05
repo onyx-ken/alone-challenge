@@ -7,10 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import onyx.challenge.application.port.outbound.EventPublisher;
 import onyx.challenge.domain.event.ChallengeCreatedEvent;
 import onyx.challenge.domain.event.DomainEvent;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile({"dev", "prod"})
 @Slf4j
 public class KafkaEventPublisher implements EventPublisher {
 
@@ -28,11 +30,18 @@ public class KafkaEventPublisher implements EventPublisher {
         String topic = resolveTopic(event);
         try {
             String eventJson = objectMapper.writeValueAsString(event);
-            kafkaTemplate.send(topic, eventJson);
-            log.info("Event published: {}", eventJson);
+            if (event instanceof ChallengeCreatedEvent) {
+                ChallengeCreatedEvent challengeEvent = (ChallengeCreatedEvent) event;
+                String key = String.valueOf(challengeEvent.getChallengeId());
+                kafkaTemplate.send(topic, key, eventJson);
+                log.info("Event published: key={}, value={}", key, eventJson);
+            } else {
+                kafkaTemplate.send(topic, eventJson);
+                log.info("Event published without key: {}", eventJson);
+            }
         } catch (JsonProcessingException e) {
             // 예외 처리 로직 (로깅 등)
-            e.printStackTrace();
+            log.error("Failed to serialize event: {}", event, e);
         }
     }
 

@@ -9,4 +9,5 @@ public interface CommentRepository {
     Comment save(Comment comment);
     Optional<Comment> load(Long commentId);
     List<Comment> getListByChallengeId(Long challengeId);
+    List<Comment> findAll();
 }

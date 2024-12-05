@@ -3,6 +3,7 @@ package onyx.challenge.application.port.outbound;
 import onyx.challenge.application.service.exceptiron.like.AlreadyLikedException;
 import onyx.challenge.domain.model.Like;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface LikeRepository {
@@ -11,4 +12,5 @@ public interface LikeRepository {
     int countByChallengeId(Long challengeId);
     void deleteById(Long likeId);
     Optional<Like> findByChallengeIdAndUserId(Long challengeId, Long userId);
+    List<Long>findByUserIdAndChallengeIdIn(Long userId, List<Long> challengeIds);
 }

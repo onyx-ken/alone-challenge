@@ -41,4 +41,10 @@ public class ChallengeController {
         return ResponseEntity.ok(ApiResponse.create(ApiStatus.SUCCESS, "챌린지가 정상적으로 생성되었습니다.", response));
     }
 
+    @GetMapping("/challenges/{challengeId}")
+    public ResponseEntity<ApiResponse<InquiryDetailResponse>> getChallengeDetail(@PathVariable Long challengeId) {
+        InquiryDetailResponse response =
+                InquiryDetailResponse.create(inquiryChallengeUseCase.getChallengeDetail(challengeId, 1, 10));
+        return ResponseEntity.ok(ApiResponse.create(ApiStatus.SUCCESS, "챌린지 상세 정보를 정상적으로 불러왔습니다.", response));
+    }
 }

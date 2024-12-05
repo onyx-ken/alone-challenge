@@ -6,14 +6,8 @@ import onyx.challenge.application.dto.ChallengeInputDTO;
 import onyx.challenge.application.dto.ChallengeOutputDTO;
 import onyx.challenge.application.dto.FileData;
 import onyx.challenge.application.port.inbound.CreateChallengeUseCase;
-import onyx.challenge.application.port.outbound.ChallengeRepository;
-import onyx.challenge.application.service.CreateChallengeService;
 import onyx.challenge.domain.event.ChallengeCreatedEvent;
-import onyx.challenge.domain.model.Challenge;
-import onyx.challenge.domain.vo.GoalContent;
-import onyx.challenge.domain.vo.GoalType;
 import onyx.challenge.domain.vo.ImageType;
-import onyx.challenge.domain.vo.Period;
 import onyx.challenge.framework.adapter.outbound.jpa.ChallengeJpaRepository;
 import onyx.challenge.framework.adapter.outbound.jpa.entity.ChallengeJPAEntity;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -35,7 +29,10 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

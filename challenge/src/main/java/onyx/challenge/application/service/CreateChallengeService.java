@@ -14,6 +14,7 @@ import onyx.challenge.domain.vo.Period;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +59,12 @@ public class CreateChallengeService implements CreateChallengeUseCase {
         Challenge savedChallenge = challengeRepository.save(challenge);
 
         // 4/ Challenge 이벤트 생성 및 발행
-        eventPublisher.publish(ChallengeCreatedEvent.create(savedChallenge.getChallengeId(), challengeInputDTO.getUserId()));
+        eventPublisher.publish(ChallengeCreatedEvent
+                .create(savedChallenge.getChallengeId(), savedChallenge.getUserId(), savedChallenge.getNickName(),
+                        savedChallenge.getPeriod().startDate().toString(), savedChallenge.getPeriod().endDate().toString(),
+                        savedChallenge.getGoalContent().getMainContent(), savedChallenge.getGoalContent().getAdditionalContent(),
+                        LocalDateTime.now()
+                        ));
 
         return ChallengeOutputDTO.from(savedChallenge, 0);
     }

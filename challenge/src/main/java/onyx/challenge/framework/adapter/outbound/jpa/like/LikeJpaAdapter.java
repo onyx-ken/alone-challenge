@@ -8,6 +8,7 @@ import onyx.challenge.framework.adapter.outbound.jpa.entity.LikeJPAEntity;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -44,5 +45,11 @@ public class LikeJpaAdapter implements LikeRepository {
     public Optional<Like> findByChallengeIdAndUserId(Long challengeId, Long userId) {
         return likeJpaRepository.findByChallengeIdAndUserId(challengeId, userId)
                 .map(LikeJPAEntity::toDomain);
+    }
+
+    @Override
+    public List<Long> findByUserIdAndChallengeIdIn(Long userId, List<Long> challengeIds) {
+        return likeJpaRepository.findByUserIdAndChallengeIdIn(userId, challengeIds)
+                .stream().map(LikeJPAEntity::getChallengeId).toList();
     }
 }

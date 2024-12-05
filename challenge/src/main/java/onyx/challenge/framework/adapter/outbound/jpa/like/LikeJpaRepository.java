@@ -12,4 +12,5 @@ public interface LikeJpaRepository extends JpaRepository<LikeJPAEntity, Long> {
     List<LikeJPAEntity> findByChallengeId(Long challengeId);
     Optional<LikeJPAEntity> findByChallengeIdAndUserId(Long challengeId, Long userId);
     int countByChallengeId(Long challengeId);
+    List<LikeJPAEntity> findByUserIdAndChallengeIdIn(Long userId, List<Long> challengeIds);
 }

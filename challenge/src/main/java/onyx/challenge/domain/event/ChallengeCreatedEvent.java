@@ -11,16 +11,31 @@ public class ChallengeCreatedEvent implements DomainEvent {
 
     private Long challengeId;
     private Long userId;
+    private String userNickName;
+    private String startDt;
+    private String endDt;
+    private String target;
+    private String userAddBody;
     private LocalDateTime occurredOn;
 
-    public static ChallengeCreatedEvent create(Long challengeId, Long userId) {
-        return new ChallengeCreatedEvent(challengeId, userId);
+    public static ChallengeCreatedEvent create(Long challengeId, Long userId, String userNickName,
+                                               String startDt, String endDt, String target,
+                                               String userAddBody, LocalDateTime occurredOn) {
+        return new ChallengeCreatedEvent(challengeId, userId, userNickName, startDt, endDt, target, userAddBody, occurredOn);
     }
 
-    private ChallengeCreatedEvent(Long challengeId, Long userId) {
+    private ChallengeCreatedEvent(Long challengeId, Long userId, String userNickName,
+                                  String startDt, String endDt,
+                                  String target, String userAddBody,
+                                  LocalDateTime occurredOn) {
         this.challengeId = challengeId;
         this.userId = userId;
-        this.occurredOn = LocalDateTime.now();
+        this.userNickName = userNickName;
+        this.startDt = startDt;
+        this.endDt = endDt;
+        this.target = target;
+        this.userAddBody = userAddBody;
+        this.occurredOn = occurredOn;
     }
 
     @Override

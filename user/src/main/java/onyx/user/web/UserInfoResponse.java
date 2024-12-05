@@ -6,6 +6,7 @@ import onyx.user.domain.valueobject.Provider;
 
 @Data
 public class UserInfoResponse {
+    private String userId;
     private String nickName;
     private String email;
     private String bio;
@@ -15,6 +16,7 @@ public class UserInfoResponse {
 
     public static UserInfoResponse from(UserEntity user) {
         UserInfoResponse response = new UserInfoResponse();
+        response.setUserId(user.getId().toString());
         response.setNickName(user.getNickName());
         response.setEmail(user.getEmail().getEmailAddress());
         response.setBio(user.getProfile().getBio());

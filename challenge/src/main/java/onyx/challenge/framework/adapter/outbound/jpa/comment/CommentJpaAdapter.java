@@ -32,4 +32,9 @@ public class CommentJpaAdapter implements CommentRepository {
     public List<Comment> getListByChallengeId(Long challengeId) {
         return commentJpaRepository.getAllByChallengeId(challengeId).stream().map(CommentJPAEntity::toDomain).toList();
     }
+
+    @Override
+    public List<Comment> findAll() {
+        return commentJpaRepository.findAll().stream().map(CommentJPAEntity::toDomain).toList();
+    }
 }

@@ -25,7 +25,7 @@ public class CommentController {
     private final DeleteCommentUseCase deleteCommentUseCase;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CommentOutputDTO>> addComment(
+    public ResponseEntity<ApiResponse<CommentResponse>> addComment(
             @PathVariable Long challengeId,
             @RequestHeader("X-User-Id") Long userId,
             @Valid @RequestBody CommentCreateRequest request) {
@@ -37,9 +37,8 @@ public class CommentController {
                 .parentCommentId(request.getParentCommentId())
                 .replyToUserId(request.getReplyToUserId())
                 .build();
-
-        CommentOutputDTO response = createCommentUseCase.createComment(inputDTO);
-        return ResponseEntity.ok(ApiResponse.create(ApiStatus.SUCCESS, "댓글이 등록되었습니다.", response));
+        return ResponseEntity.ok(ApiResponse.create(ApiStatus.SUCCESS, "댓글이 등록되었습니다.",
+                CommentResponse.create(createCommentUseCase.createComment(inputDTO))));
     }
 
     @PutMapping("/{commentId}")

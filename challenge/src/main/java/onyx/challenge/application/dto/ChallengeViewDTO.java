@@ -7,6 +7,7 @@ import java.time.LocalDate;
 @Data
 public class ChallengeViewDTO {
     private final Long challengeId;
+    private final Long userId;
     private final String nickName;
     private final LocalDate startDate;
     private final LocalDate endDate;

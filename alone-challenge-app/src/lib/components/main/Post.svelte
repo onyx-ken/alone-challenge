@@ -1,27 +1,24 @@
+<!-- Post.svelte -->
 <script>
+    import { createEventDispatcher } from 'svelte';
     import { goto } from '$app/navigation';
     import HeartIcon from "$lib/components/icon/HeartIcon.svelte";
-    import MessgeIcon from "$lib/components/icon/MessageIcon.svelte";
+    import MessageIcon from "$lib/components/icon/MessageIcon.svelte";
 
     export let user;
     export let imageUrl;
     export let content;
     export let likes;
-    export let comments;
+    export let commentCount;
+    export let id; // Ensure that each post has a unique identifier
 
     let showFullContent = false;
-    let visibleComments = comments.slice(0, 5);
-    let showAllComments = false;
-    let isLiked = false;
-    let commentInput = null;  // input 요소에 접근하기 위한 ref
+    export let isLiked = false;
+
+    const dispatch = createEventDispatcher();
 
     const toggleContent = () => {
         showFullContent = !showFullContent;
-    }
-
-    const toggleComments = () => {
-        showAllComments = !showAllComments;
-        visibleComments = showAllComments ? comments : comments.slice(0, 5);
     }
 
     const toggleLike = () => {
@@ -34,7 +31,8 @@
     }
 
     const handleCommentIconClick = () => {
-        commentInput.focus();
+        // Dispatch a custom event with the post's data
+        dispatch('openModal', { postId: id, user, content, imageUrl, likes, commentCount, isLiked });
     }
 </script>
 
@@ -48,12 +46,12 @@
                 aria-label="User profile"
                 on:click={handleClick}
                 on:keydown={(event) => {
-			if (event.key === 'Enter' || event.key === ' ') {
-				handleClick();
-			}
-		}}
+                if (event.key === 'Enter' || event.key === ' ') {
+                    handleClick();
+                }
+            }}
         >
-            <img src={user.avatar} alt="avatar" class="rounded-full h-12 w-12 mr-4"/>
+            <img src={user.avatar} alt={`${user.name}'s avatar`} class="rounded-full h-12 w-12 mr-4"/>
             <p class="font-semibold">{user.name}</p>
         </div>
     </div>
@@ -79,35 +77,22 @@
 
     <!-- Post Actions -->
     <div class="post-actions flex items-center p-4">
-        <button class="btn btn-ghost btn-square" on:click={toggleLike}>
+        <button class="btn btn-ghost btn-square" on:click={toggleLike} aria-label={isLiked ? "Unlike" : "Like"}>
             {#if isLiked}
-                <HeartIcon />
+                <HeartIcon fill="currentColor"/>
             {:else}
-                <HeartIcon fill="none" className="h-6 w-6"/>
+                <HeartIcon fill="none" class="h-6 w-6"/>
             {/if}
         </button>
         <p class="text-sm font-semibold">{likes} likes</p>
-            <button class="btn btn-ghost btn-square" on:click={handleCommentIconClick}>
-                <MessgeIcon  className="w-6 h-6"/>
-            </button>
-        <p class="text-sm font-semibold">{comments.length} comments</p>
-
-    </div>
-
-    <!-- Comments Section -->
-    <div class="post-comments p-4">
-        {#each visibleComments as comment}
-            <p><span class="font-semibold">{comment.user}:</span> {comment.text}</p>
-        {/each}
-        {#if comments.length > 5}
-            <button class="text-blue-500" on:click={toggleComments}>
-                {showAllComments ? 'Hide comments' : 'View all comments'}
-            </button>
-        {/if}
+        <button class="btn btn-ghost btn-square ml-4" on:click={handleCommentIconClick} aria-label="View comments">
+            <MessageIcon class="w-6 h-6"/>
+        </button>
+        <p class="text-sm font-semibold">{commentCount} comments</p>
     </div>
 
     <!-- Comment Input -->
     <div class="post-comment-input p-4">
-        <input type="text" placeholder="Add a comment..." class="input input-bordered w-full" bind:this={commentInput}/>
+        <input type="text" placeholder="Add a comment..." class="input input-bordered w-full" />
     </div>
 </div>
